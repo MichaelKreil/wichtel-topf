@@ -309,7 +309,7 @@ describe('privacy page', () => {
 		assert.match(html, /Datenschutzerklärung/);
 		assert.match(html, /Gottschedstrasse 4<br>/);
 		assert.ok(!html.includes('BITTE ERGÄNZEN'));
-		assert.match(await (await get('/')).text(), /<a href="\/datenschutz">Datenschutz<\/a>/);
+		assert.match(await (await get('/')).text(), /<a href="\/datenschutz">Impressum und Datenschutz<\/a>/);
 		assert.match(await (await get('/Unknown-abcdefgh')).text(), /href="\/datenschutz"/);
 	});
 });
