@@ -15,9 +15,11 @@ export default defineConfig({
 		trace: 'retain-on-failure',
 	},
 	projects: [
-		{ name: 'chrome', use: { ...devices['Pixel 7'] } },
-		{ name: 'safari', use: { ...devices['iPhone 15'] } },
-		{ name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+		{ name: 'chrome', use: { ...devices['Pixel 7'] }, testIgnore: 'visual.spec.ts' },
+		{ name: 'safari', use: { ...devices['iPhone 15'] }, testIgnore: 'visual.spec.ts' },
+		{ name: 'firefox', use: { ...devices['Desktop Firefox'] }, testIgnore: 'visual.spec.ts' },
+		// comparison with reference screenshots: only on demand (npm run test:visual), see e2e/visual.spec.ts
+		{ name: 'visual', use: { ...devices['Desktop Chrome'] }, testMatch: 'visual.spec.ts' },
 	],
 	webServer: {
 		command: 'node src/server.ts',
