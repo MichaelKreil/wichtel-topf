@@ -284,6 +284,128 @@ describe('deleting data', () => {
 	});
 });
 
+describe('security', () => {
+	/** All kinds of pages, as different people see them. */
+	async function allPages() {
+		const { potPath, adminPath } = await createPot();
+		const anna = await join(potPath, 'Anna');
+		await join(potPath, 'Ben');
+		await join(potPath, 'Carla');
+		const open = {
+			start: await get('/'),
+			pot: await get(potPath),
+			personal: await get(anna.personalPath),
+			admin: await get(adminPath),
+			privacy: await get('/datenschutz'),
+			notFound: await get('/Unknown-abcdefgh'),
+			rejected: await post(potPath, { name: 'X' }, { 'Sec-Fetch-Site': 'cross-site' }),
+		};
+		await post(`${adminPath}/schliessen`, {});
+		const closed = {
+			result: await get(potPath),
+			personalResult: await get(anna.personalPath),
+			adminResult: await get(adminPath),
+		};
+		return { ...open, ...closed };
+	}
+
+	it('sends security headers with every page', async () => {
+		for (const [name, res] of Object.entries(await allPages())) {
+			const csp = res.headers.get('content-security-policy') ?? '';
+			for (const directive of [
+				"default-src 'self'",
+				"base-uri 'none'",
+				"form-action 'self'",
+				"frame-ancestors 'none'",
+				"object-src 'none'",
+			])
+				assert.ok(csp.includes(directive), `${name}: CSP ${directive}`);
+			assert.ok(!csp.includes('unsafe'), `${name}: no unsafe CSP sources`);
+			assert.equal(res.headers.get('referrer-policy'), 'no-referrer', `${name}: referrer policy`);
+			assert.equal(res.headers.get('x-content-type-options'), 'nosniff', `${name}: nosniff`);
+			assert.equal(res.headers.get('cache-control'), 'no-store', `${name}: not cached`);
+		}
+	});
+
+	it('has no inline scripts, event handlers or styles that the CSP would block', async () => {
+		for (const [name, res] of Object.entries(await allPages())) {
+			const html = await res.text();
+			assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>/.test(html), `${name}: inline script`);
+			assert.ok(!/\son[a-z]+=/i.test(html), `${name}: inline event handler`);
+			assert.ok(!/\sstyle=/i.test(html), `${name}: inline style`);
+		}
+	});
+
+	it('sets the participant cookie with safe flags', async () => {
+		const { potPath } = await createPot();
+		const cookie = (await post(potPath, { name: 'Anna' })).headers.get('set-cookie') ?? '';
+		assert.match(cookie, /HttpOnly/);
+		assert.match(cookie, /SameSite=Lax/);
+		assert.match(cookie, /Path=\//);
+		assert.match(cookie, /Max-Age=\d+/);
+		assert.doesNotMatch(cookie, /Secure/, 'plain http in tests');
+
+		const https = createApp({ store, baseUrl: 'https://wichteltopf.de' });
+		const res = await https.request(`https://wichteltopf.de${potPath}`, {
+			method: 'POST',
+			body: new URLSearchParams({ name: 'Ben' }),
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Sec-Fetch-Site': 'same-origin' },
+		});
+		assert.match(res.headers.get('set-cookie') ?? '', /Secure/, 'https');
+	});
+
+	it('escapes names in text and attributes on every page', async () => {
+		const evil = `"><img src=x onerror=alert(1)>'`;
+		const { potPath, adminPath } = await createPot();
+		const mallory = await join(potPath, evil);
+		await join(potPath, 'Ben');
+		await join(potPath, 'Carla');
+		const pages = [potPath, mallory.personalPath, adminPath];
+		const check = async (path: string) => {
+			const html = await (await get(path)).text();
+			assert.ok(!html.includes('<img src=x'), `${path}: raw HTML`);
+			assert.ok(!html.includes(`"><img`), `${path}: breaks out of an attribute`);
+			assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), `${path}: the name is shown escaped`);
+		};
+		for (const path of pages) await check(path);
+		await post(`${adminPath}/schliessen`, {});
+		for (const path of pages) await check(path);
+	});
+
+	it('never shows secret links or code names to the wrong people', async () => {
+		const { potPath, adminPath } = await createPot();
+		const adminToken = adminPath.split('/').pop() as string;
+		const anna = await join(potPath, 'Anna');
+		const ben = await join(potPath, 'Ben');
+		await join(potPath, 'Carla');
+		const annaToken = anna.personalPath.split('/').pop() as string;
+		const benToken = ben.personalPath.split('/').pop() as string;
+		const codeNames = (await store.listParticipants(potPath.slice(1))).map((p) => p.codeName);
+
+		const potPage = await (await get(potPath)).text();
+		for (const secret of [adminToken, annaToken, benToken, ...codeNames])
+			assert.ok(!potPage.includes(secret), `pot page shows ${secret}`);
+		const adminPage = await (await get(adminPath)).text();
+		for (const secret of [annaToken, benToken, ...codeNames])
+			assert.ok(!adminPage.includes(secret), `admin page shows ${secret}`);
+		const annaPage = await (await get(anna.personalPath)).text();
+		for (const secret of [adminToken, benToken]) assert.ok(!annaPage.includes(secret), `Anna's page shows ${secret}`);
+
+		// after the draw, the code names appear, but still no secret links
+		await post(`${adminPath}/schliessen`, {});
+		const result = await (await get(potPath)).text();
+		for (const secret of [adminToken, annaToken, benToken])
+			assert.ok(!result.includes(secret), `result shows ${secret}`);
+	});
+
+	it('rejects oversized form submissions', async () => {
+		const { potPath } = await createPot();
+		const res = await post(potPath, { name: 'x'.repeat(20_000) });
+		assert.equal(res.status, 413);
+		assert.equal((await store.listParticipants(potPath.slice(1))).length, 0);
+	});
+});
+
 describe('input validation', () => {
 	it('treats uploaded files as missing names', async () => {
 		const { potPath } = await createPot();
