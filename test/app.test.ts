@@ -117,6 +117,11 @@ describe('app', () => {
 
 		await join(potPath, 'Ben');
 		await join(potPath, 'Carla');
+		// the names of the people in the pot are written by hand
+		assert.match(
+			await (await get(potPath)).text(),
+			/<span class="hand">&lt;script&gt;alert\(1\)&lt;\/script&gt;<\/span>, <span class="hand">Anna<\/span>, <span class="hand">Ben<\/span> und <span class="hand">Carla<\/span> machen bereits mit\./,
+		);
 
 		// the admin joins like everyone else
 		assert.ok(admin.includes(`<a class="button secondary" href="http://localhost${potPath}">Selbst mitmachen</a>`));

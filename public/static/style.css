@@ -210,6 +210,15 @@ b {
 	color: var(--wax);
 }
 
+/* names written by hand in running text, e.g. who is in the pot */
+.hand {
+	font-family: var(--hand);
+	font-weight: 600;
+	font-size: 1.35em;
+	line-height: 1;
+	white-space: nowrap;
+}
+
 /* --- gift tags: the signature element --- */
 
 .tag {

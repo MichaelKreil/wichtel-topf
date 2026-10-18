@@ -24,10 +24,12 @@ export function deletionDate(updatedAt: number, ttlDays: number): string {
 	return formatDate(updatedAt + ttlDays * DAY);
 }
 
-/** "Anna", "Anna und Ben", "Anna, Ben und Carla" */
-export function joinNames(names: string[]): string {
-	if (names.length <= 1) return names.join('');
-	return `${names.slice(0, -1).join(', ')} und ${names.at(-1)}`;
+/** "Anna", "Anna und Ben", "Anna, Ben und Carla", each name written by hand */
+export function joinNames(names: string[]): Html {
+	const hand = (name: string) => html`<span class="hand">${name}</span>`;
+	if (names.length <= 1) return html`${names.map(hand)}`;
+	const last = names.at(-1) as string;
+	return html`${names.slice(0, -1).map((name, i) => html`${i > 0 ? ', ' : ''}${hand(name)}`)} und ${hand(last)}`;
 }
 
 /**
