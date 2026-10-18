@@ -7,6 +7,8 @@ An online "Wichteltopf" (Secret Santa pot):
 3. The organiser can remove participants and add **exclusions** (e.g. couples shouldn't draw each other).
 4. Closing the pot draws the assignment: one big circle where possible, so there are no "A ↔ B" pairs. The result page lists "code name → receiver" and is visible to everyone with the participation link. Each participant only knows their own code name.
 
+The roles, the identity model and what is deliberately out of scope are described in [CONCEPT.md](CONCEPT.md).
+
 ## Development
 
 Requires Node.js ≥ 24 (TypeScript runs natively, no build step).
