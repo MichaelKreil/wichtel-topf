@@ -8,17 +8,15 @@ import { safeEqual } from './random.ts';
 import type { RateLimiters } from './rate-limit.ts';
 import { canDraw, cleanName, type Participant, type Pot, type Store } from './store.ts';
 import { getTheme, randomTheme, themeOrDefault } from './themes.ts';
-import {
-	adminPage,
-	messagePage,
-	type Page,
-	personalPage,
-	potPage,
-	privacyPage,
-	type ResultRow,
-	resultPage,
-	startPage,
-} from './views.ts';
+import { adminPage } from './views/admin.ts';
+import type { Page } from './views/layout.ts';
+import { messagePage } from './views/message.ts';
+import type { ResultRow } from './views/parts.ts';
+import { personalPage } from './views/personal.ts';
+import { potPage } from './views/pot.ts';
+import { privacyPage } from './views/privacy.ts';
+import { resultPage } from './views/result.ts';
+import { startPage } from './views/start.ts';
 
 export interface AppOptions {
 	store: Store;

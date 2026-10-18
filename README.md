@@ -33,7 +33,7 @@ npm run format   # auto-format with Biome
 | `src/db-node.ts`      | Database driver for `node:sqlite`                             |
 | `migrations/`         | SQL schema, used by both drivers                              |
 | `src/draw.ts`         | The drawing algorithm                                         |
-| `src/views.ts`        | Server-rendered HTML                                          |
+| `src/views/`          | Server-rendered HTML: `layout.ts`, shared `parts.ts`, one file per page |
 | `src/themes.ts`       | Background themes                                             |
 | `src/codenames.ts`    | Code name lists to choose from; a list's size limits the pot |
 | `public/static/`      | CSS, JS, generated images                                     |
