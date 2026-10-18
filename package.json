@@ -15,6 +15,7 @@
 		"test": "node --test \"test/**/*.test.ts\"",
 		"test:mobile": "node scripts/mobile-check.ts",
 		"screenshots": "node scripts/screenshots.ts",
+		"smoke": "node scripts/smoke-test.ts",
 		"typecheck": "tsc --noEmit",
 		"lint": "biome check .",
 		"format": "biome check --write .",
