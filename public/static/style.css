@@ -634,11 +634,19 @@ button.large {
 
 .list li {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: space-between;
 	align-items: center;
 	gap: 8px;
 	padding: 6px 0;
 	border-bottom: 1px dashed var(--card-edge);
+}
+
+/* the name takes the space; on narrow phones the buttons move below it */
+.list li > span:first-child {
+	flex: 1 1 10rem;
+	min-width: 0;
+	overflow-wrap: anywhere;
 }
 
 .pair {
