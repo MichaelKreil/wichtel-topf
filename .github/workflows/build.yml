@@ -21,7 +21,8 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
-      - run: npm test
+      - name: Tests with minimum coverage
+        run: npm run test:coverage
 
   mobile:
     name: Mobile usability

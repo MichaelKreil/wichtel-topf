@@ -13,6 +13,7 @@
 		"cf:dev": "wrangler d1 migrations apply DB --local && wrangler dev",
 		"deploy": "wrangler d1 migrations apply DB --remote && wrangler deploy",
 		"test": "node --test \"test/**/*.test.ts\"",
+		"test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=95 --test-coverage-branches=85 --test-coverage-functions=90 \"test/**/*.test.ts\"",
 		"test:mobile": "node scripts/mobile-check.ts",
 		"screenshots": "node scripts/screenshots.ts",
 		"smoke": "node scripts/smoke-test.ts",
