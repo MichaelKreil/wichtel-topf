@@ -126,9 +126,12 @@ export interface Browser {
 	evaluate<T>(expression: string): Promise<T>;
 	/** PNG of the current viewport */
 	screenshot(): Promise<Buffer>;
-	/** PNG of the whole page, rendered as if the screen were as tall as the page */
+	/** PNG of the whole page, rendered as if the screen were as tall as the page (long pages at a lower resolution) */
 	fullPageScreenshot(): Promise<Buffer>;
 }
+
+/** Device pixels; taller full page screenshots are scaled down */
+const MAX_CAPTURE_HEIGHT = 7000;
 
 function findChrome(): string {
 	const candidates = [
@@ -188,8 +191,8 @@ export async function startBrowser(): Promise<Browser> {
 	await applyMedia();
 
 	let viewport = { width: 390, height: 844, deviceScaleFactor: 2 };
-	const applyViewport = (height = viewport.height) =>
-		send('Emulation.setDeviceMetricsOverride', { ...viewport, height, mobile: true });
+	const applyViewport = (height = viewport.height, deviceScaleFactor = viewport.deviceScaleFactor) =>
+		send('Emulation.setDeviceMetricsOverride', { ...viewport, height, deviceScaleFactor, mobile: true });
 
 	const evaluate = async <T>(expression: string): Promise<T> => {
 		const { result } = (await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true })) as {
@@ -234,7 +237,8 @@ export async function startBrowser(): Promise<Browser> {
 		screenshot: capture,
 		async fullPageScreenshot() {
 			const height = await evaluate<number>('document.documentElement.scrollHeight');
-			await applyViewport(height);
+			// headless Chrome never finishes captures taller than about 7200 device pixels, so long pages get a lower resolution
+			await applyViewport(height, Math.min(viewport.deviceScaleFactor, MAX_CAPTURE_HEIGHT / height));
 			await imagesLoaded(); // lazy images that just became visible
 			const png = await capture();
 			await applyViewport();
