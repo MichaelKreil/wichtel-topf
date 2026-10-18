@@ -59,7 +59,7 @@ function layout(page: Page, title: string, content: Html, options: LayoutOptions
 <body data-theme="${page.theme}">
 	<main>
 		${content}
-		<footer><a href="/datenschutz">Datenschutz</a></footer>
+		<footer><a href="/datenschutz">Impressum und Datenschutz</a></footer>
 	</main>
 </body>
 </html>`;
