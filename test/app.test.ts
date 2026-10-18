@@ -78,9 +78,9 @@ describe('app', () => {
 		assert.match(anna.html, /Merke dir deinen geheimen Codenamen:/);
 		assert.match(anna.html, /<span class="tag-value important">/, 'the code name is written in red ink');
 		assert.ok(anna.html.includes(`http://localhost${anna.personalPath}`));
-		// the personal link is for saving, not for sharing with others
-		assert.match(anna.html, /data-share="[^"]*nicht weitergeben[^"]*" hidden>Speichern</);
-		assert.doesNotMatch(anna.html, />Teilen</);
+		// the personal link is for bookmarking, not for sharing with others
+		assert.match(anna.html, /Setz dir ein Lesezeichen/);
+		assert.doesNotMatch(anna.html, /data-share/);
 		assert.match(
 			anna.html,
 			/<div class="copy secret">\s*<label><span class="lock"[^>]*>🔒<\/span> Adresse dieser Seite/,

@@ -116,7 +116,7 @@ test('participants can leave before the draw, after confirming', async ({ page, 
 	await expect(anna.getByText('Noch ist niemand im Topf.')).toBeVisible();
 });
 
-test('links can be copied, and shared only where the device can share', async ({ page, person, browserName }) => {
+test('the personal page address can be copied and mailed', async ({ page, person, browserName }) => {
 	await page.goto('/');
 	await page.getByRole('button', { name: 'Wichteltopf anlegen' }).click();
 	const potUrl = await page.getByLabel(/Teilnahme-Link/).inputValue();
@@ -131,9 +131,8 @@ test('links can be copied, and shared only where the device can share', async ({
 	const personalUrl = await field.inputValue();
 	expect(personalUrl).toBe(anna.url().replace(/\?.*/, ''));
 
-	// the save button (share sheet) is only shown where there is one
-	const canShare = await anna.evaluate(() => typeof navigator.share === 'function');
-	await expect(anna.getByRole('button', { name: 'Speichern' })).toBeVisible({ visible: canShare });
+	// no share button for the personal link, it is for bookmarking
+	await expect(anna.locator('[data-share]')).toHaveCount(0);
 	await expect(anna.getByRole('link', { name: 'An mich mailen' })).toHaveAttribute(
 		'href',
 		new RegExp(encodeURIComponent(personalUrl).replace(/[.?]/g, '\\$&')),
