@@ -95,7 +95,7 @@ main {
 /* frosted glass: the photo shows through, blurred, so the card feels part of the picture */
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
 	main {
-		background: color-mix(in oklab, var(--card) 75%, transparent);
+		background: color-mix(in oklab, var(--card) 84%, transparent);
 		-webkit-backdrop-filter: blur(24px) saturate(1.4) brightness(1.4);
 		backdrop-filter: blur(24px) saturate(1.4) brightness(1.4);
 	}
