@@ -74,9 +74,36 @@ for (const button of document.querySelectorAll('[data-copy]')) {
 	});
 }
 
-// Confirmation for destructive forms
-for (const form of document.querySelectorAll('form[data-confirm]')) {
-	form.addEventListener('submit', (event) => {
-		if (!confirm(form.dataset.confirm)) event.preventDefault();
+// Confirmation for destructive forms: a dialog in the page's design instead of the browser's confirm().
+// The confirming button repeats the label of the button that was pressed. Without JavaScript, forms just submit.
+const confirmForms = document.querySelectorAll('form[data-confirm]');
+if (confirmForms.length > 0) {
+	const dialog = document.createElement('dialog');
+	dialog.className = 'confirm';
+	dialog.innerHTML =
+		'<p></p><div class="dialog-actions"><button type="button" class="secondary" data-cancel>Abbrechen</button><button type="button" data-ok></button></div>';
+	document.body.append(dialog);
+	const message = dialog.querySelector('p');
+	const ok = dialog.querySelector('[data-ok]');
+	let pending;
+	dialog.querySelector('[data-cancel]').addEventListener('click', () => dialog.close());
+	dialog.addEventListener('click', (event) => {
+		if (event.target === dialog) dialog.close(); // the backdrop
 	});
+	ok.addEventListener('click', () => {
+		const form = pending;
+		dialog.close();
+		form.dataset.confirmed = '';
+		form.requestSubmit();
+	});
+	for (const form of confirmForms) {
+		form.addEventListener('submit', (event) => {
+			if ('confirmed' in form.dataset) return;
+			event.preventDefault();
+			pending = form;
+			message.textContent = form.dataset.confirm;
+			ok.textContent = event.submitter?.textContent.trim() || 'Ja';
+			dialog.showModal(); // focuses "Abbrechen", the safe choice
+		});
+	}
 }

@@ -690,6 +690,37 @@ button.large {
 	}
 }
 
+/* confirmation dialog, in the page's design */
+dialog.confirm {
+	max-width: min(24rem, calc(100vw - 32px));
+	padding: 20px 24px;
+	border: 0;
+	border-radius: 14px;
+	background: var(--card);
+	color: var(--ink);
+	box-shadow: 0 22px 48px -18px rgb(0 0 0 / 0.55);
+}
+
+dialog.confirm::backdrop {
+	background: rgb(20 10 5 / 0.45);
+}
+
+dialog.confirm p {
+	margin: 0 0 1.2rem;
+	font-size: 1.1rem;
+}
+
+.dialog-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.dialog-actions button {
+	margin: 0;
+}
+
 footer {
 	margin-top: 2rem;
 	padding-top: 0.5rem;

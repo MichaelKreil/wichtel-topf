@@ -36,8 +36,10 @@ test('an organiser and four participants go through a whole round', async ({ pag
 	await page.getByLabel('Zweite Person').selectOption({ label: 'Ben' });
 	await page.getByRole('button', { name: 'Hinzufügen' }).click();
 	await expect(page.getByText('Anna ⟷ Ben')).toBeVisible();
-	page.once('dialog', (dialog) => dialog.accept());
 	await page.getByRole('button', { name: 'Topf schließen und auslosen' }).click();
+	const confirmation = page.getByRole('dialog');
+	await expect(confirmation).toContainText('Topf jetzt wirklich schließen und auslosen?');
+	await confirmation.getByRole('button', { name: 'Topf schließen und auslosen' }).click();
 	await expect(page.getByRole('heading', { name: 'Die Ziehung ist abgeschlossen' })).toBeVisible();
 
 	// everyone sees whom they give a present to, and the whole list with their own row marked
@@ -95,12 +97,20 @@ test('participants can leave before the draw, after confirming', async ({ page, 
 	await anna.getByLabel('Dein Vor- und Nachname').fill('Anna');
 	await anna.getByRole('button', { name: 'Mitmachen' }).click();
 
-	anna.once('dialog', (dialog) => dialog.dismiss());
+	// the confirmation is a dialog in the page's design; cancelling (also with Escape) changes nothing
 	await anna.getByRole('button', { name: 'Mich austragen' }).click();
+	const confirmation = anna.getByRole('dialog');
+	await expect(confirmation).toContainText('Wirklich aus dem Wichteltopf austragen?');
+	await expect(confirmation.getByRole('button', { name: 'Abbrechen' }), 'the safe choice is focused').toBeFocused();
+	await confirmation.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(confirmation).toBeHidden();
+	await anna.getByRole('button', { name: 'Mich austragen' }).click();
+	await anna.keyboard.press('Escape');
+	await expect(confirmation).toBeHidden();
 	await expect(anna.getByRole('heading', { name: 'Schön, dass du mitmachst!' }), 'cancelled').toBeVisible();
 
-	anna.once('dialog', (dialog) => dialog.accept());
 	await anna.getByRole('button', { name: 'Mich austragen' }).click();
+	await confirmation.getByRole('button', { name: 'Mich austragen' }).click();
 	await expect(anna.getByRole('heading', { name: 'Du bist ausgetragen' })).toBeVisible();
 	await anna.goto(potUrl);
 	await expect(anna.getByText('Noch ist niemand im Topf.')).toBeVisible();
