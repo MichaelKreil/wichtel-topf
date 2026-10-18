@@ -38,6 +38,7 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 						])
 					: ''
 			}
+			<p>Unterschreib das Geschenk mit deinem Codenamen, nicht mit deinem Namen. So bleibt geheim, von wem es kommt.</p>
 			<h2>Alle Ergebnisse</h2>
 			${resultList(result, participant.codeName)}`,
 		);
@@ -46,11 +47,12 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 		page,
 		'Du bist dabei',
 		html`<h1>${isNew ? 'Schön, dass du mitmachst!' : 'Du bist dabei'}</h1>
-		<p>Du bist als <b>${participant.name}</b> im Topf. Dein geheimer Codename lautet:</p>
+		<p>Du bist als <b>${participant.name}</b> im Topf. Dein geheimer Codename:</p>
 		${giftTag([['Von:', participant.codeName]])}
-		<p>Verrate ihn niemandem! Nach der Auslosung steht hier, für wen dein Geschenk ist.</p>
-		<h2>Dein persönlicher Link</h2>
-		<p>Mit diesem Link siehst du jederzeit deinen Codenamen und nach der Auslosung, wen du beschenkst, auch auf einem anderen Gerät. Setz dir am besten ein Lesezeichen oder schick ihn dir selbst. Gib ihn nicht weiter.</p>
+		<h2>Dein Codename ist dein Schlüssel</h2>
+		<p>Merk ihn dir oder mach ein Foto von dieser Seite. Nach der Auslosung findest du damit in der Liste hinter dem Teilnahme-Link, wen du beschenkst. Verrate ihn niemandem: Wer deinen Codenamen kennt, weiß nachher, von wem das Geschenk kommt.</p>
+		<h2>Auf einem anderen Gerät?</h2>
+		<p>Dieser Browser merkt sich, dass du ${participant.name} bist. Dein persönlicher Link öffnet deine Seite auch auf anderen Geräten, und nur damit kannst du dich wieder austragen. Gib ihn nicht weiter.</p>
 		${copyField('Persönlicher Link: nur für dich', personalUrl, {
 			share: { label: 'Speichern', text: 'Mein persönlicher Wichtel-Link (nicht weitergeben):' },
 			extra: html`<a class="button secondary" href="${personalMail(personalUrl)}">An mich mailen</a>`,

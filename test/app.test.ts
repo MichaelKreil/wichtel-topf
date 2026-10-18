@@ -71,7 +71,8 @@ describe('app', () => {
 		assert.equal(anna.res.status, 303);
 		assert.match(anna.personalPath, new RegExp(`^${potPath}/ich/[a-z0-9]{24}$`));
 		assert.match(anna.html, /Schön, dass du mitmachst/);
-		assert.match(anna.html, /Dein geheimer Codename lautet/);
+		assert.match(anna.html, /Dein geheimer Codename:/);
+		assert.match(anna.html, /Dein Codename ist dein Schlüssel/);
 		assert.ok(anna.html.includes(`http://localhost${anna.personalPath}`));
 		// the personal link is for saving, not for sharing with others
 		assert.match(anna.html, /data-share="[^"]*nicht weitergeben[^"]*" hidden>Speichern</);
