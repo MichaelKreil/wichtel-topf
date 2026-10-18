@@ -75,13 +75,16 @@ describe('app', () => {
 		assert.equal(anna.res.status, 303);
 		assert.match(anna.personalPath, new RegExp(`^${potPath}/ich/[a-z0-9]{24}$`));
 		assert.match(anna.html, /Schön, dass du mitmachst/);
-		assert.match(anna.html, /Dein geheimer Codename:/);
-		assert.match(anna.html, /Dein Codename ist dein Schlüssel/);
+		assert.match(anna.html, /Merke dir deinen geheimen Codenamen:/);
+		assert.match(anna.html, /<span class="tag-value important">/, 'the code name is written in red ink');
 		assert.ok(anna.html.includes(`http://localhost${anna.personalPath}`));
 		// the personal link is for saving, not for sharing with others
 		assert.match(anna.html, /data-share="[^"]*nicht weitergeben[^"]*" hidden>Speichern</);
 		assert.doesNotMatch(anna.html, />Teilen</);
-		assert.match(anna.html, /<div class="copy secret">\s*<label><span class="lock"[^>]*>🔒<\/span> Persönlicher Link/);
+		assert.match(
+			anna.html,
+			/<div class="copy secret">\s*<label><span class="lock"[^>]*>🔒<\/span> Adresse dieser Seite/,
+		);
 		assert.ok(anna.html.includes(`href="mailto:?subject=Mein%20Wichtel-Link&amp;body=`), 'mail to self');
 		assert.ok(anna.html.includes(encodeURIComponent(`http://localhost${anna.personalPath}`)), 'link in mail');
 		assert.match(anna.cookie, /^wichtel_/);
@@ -492,7 +495,7 @@ describe('code name lists', () => {
 		const adminPath = new URL(res.headers.get('location') ?? '', BASE).pathname;
 		const potPath = adminPath.replace(/\/admin\/.*/, '');
 		const anna = await join(potPath, 'Anna');
-		const codeName = anna.html.match(/Von:<\/span> <span class="tag-value">([^<]+)<\/span>/)?.[1] ?? '';
+		const codeName = anna.html.match(/Von:<\/span> <span class="tag-value[^"]*">([^<]+)<\/span>/)?.[1] ?? '';
 		assert.ok(getCodeNameList('mittelerde')?.names.includes(codeName), codeName);
 		assert.match(await (await get(adminPath)).text(), /Im Topf \(1 von max\. 43\)/);
 	});

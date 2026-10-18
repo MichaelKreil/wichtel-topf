@@ -34,12 +34,16 @@ export function joinNames(names: string[]): Html {
 
 /**
  * A paper gift tag with a punched hole and string, written by hand: the signature element.
- * Each line is a label ("Von:", "Für:") and a value.
+ * Each line is a label ("Von:", "Für:") and a value. `emphasize` is the index of a line whose value
+ * is written in red ink, because it matters most (e.g. the code name to remember).
  */
-export function giftTag(lines: [string, string][]): Html {
+export function giftTag(lines: [string, string][], { emphasize }: { emphasize?: number } = {}): Html {
 	return html`<div class="tag">
 		<div class="tag-paper">
-			${lines.map(([label, value]) => html`<span class="tag-line"><span class="tag-label">${label}</span> <span class="tag-value">${value}</span></span>`)}
+			${lines.map(
+				([label, value], i) =>
+					html`<span class="tag-line"><span class="tag-label">${label}</span> <span class="tag-value${i === emphasize ? ' important' : ''}">${value}</span></span>`,
+			)}
 		</div>
 	</div>`;
 }

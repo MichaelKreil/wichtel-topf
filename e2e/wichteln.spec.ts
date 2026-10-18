@@ -117,7 +117,7 @@ test('links can be copied, and shared only where the device can share', async ({
 	await anna.getByLabel('Dein Vor- und Nachname').fill('Anna');
 	await anna.getByRole('button', { name: 'Mitmachen' }).click();
 
-	const field = anna.getByLabel(/Persönlicher Link/);
+	const field = anna.getByLabel(/Adresse dieser Seite/);
 	const personalUrl = await field.inputValue();
 	expect(personalUrl).toBe(anna.url().replace(/\?.*/, ''));
 

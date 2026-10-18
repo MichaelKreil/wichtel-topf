@@ -282,6 +282,11 @@ b {
 	overflow-wrap: break-word;
 }
 
+/* red ink for what matters most, e.g. the code name to remember */
+.tag-value.important {
+	color: var(--wax-dark);
+}
+
 /* all results: a handwritten note on ruled paper */
 .note {
 	--line: 2.1rem;
