@@ -3,5 +3,7 @@ database/
 *.sqlite*
 .wrangler/
 screenshots/
+test-results/
+playwright-report/
 # raw AI-generated originals, kept locally
 gemini*/

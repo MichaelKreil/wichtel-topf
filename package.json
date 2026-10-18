@@ -15,6 +15,7 @@
 		"test": "node --test \"test/**/*.test.ts\"",
 		"test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=95 --test-coverage-branches=85 --test-coverage-functions=90 \"test/**/*.test.ts\"",
 		"test:mobile": "node scripts/mobile-check.ts",
+		"test:e2e": "playwright test",
 		"screenshots": "node scripts/screenshots.ts",
 		"smoke": "node scripts/smoke-test.ts",
 		"typecheck": "tsc --noEmit",
@@ -33,6 +34,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.15",
+		"@playwright/test": "^1.64.1",
 		"@types/node": "^26.6.5",
 		"npm-check-updates": "^23.1.1",
 		"typescript": "^7.0.2",

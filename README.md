@@ -18,6 +18,7 @@ npm run cf:dev   # Cloudflare version with local D1: http://localhost:8787
 npm run check    # typecheck + lint + tests
 npm run test:coverage  # tests with a coverage report; CI fails below 95 % lines, 85 % branches, 90 % functions
 npm run test:mobile  # checks all pages at phone widths in headless Chrome
+npm run test:e2e     # end-to-end tests in Chrome, Safari and Firefox (once: npx playwright install chromium webkit firefox)
 npm run screenshots  # phone screenshots of all pages into screenshots/ (demo data: scripts/demo.ts)
 npm run smoke    # read-only checks of the live site (runs in CI after each deploy)
 npm run format   # auto-format with Biome
