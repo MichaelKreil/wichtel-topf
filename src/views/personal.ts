@@ -50,9 +50,9 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 		<p>Du bist als <b>${participant.name}</b> im Topf. Merke dir deinen geheimen Codenamen:</p>
 		${giftTag([['Von:', participant.codeName]], { emphasize: 0 })}
 		<p>Mach am besten ein Foto von dieser Seite. Nach der Auslosung findest du mit dem Codenamen in der Liste, wen du beschenkst. Verrate ihn niemandem: Wer deinen Codenamen kennt, weiß nachher, von wem das Geschenk kommt.</p>
-		<h2>Diese Seite merken</h2>
-		<p>Diese Seite gehört nur dir, und dieser Browser merkt sie sich. Setz dir ein Lesezeichen, dann findest du sie später leicht wieder. Auf einem anderen Gerät kommst du mit ihrer Adresse hierher. Gib sie nicht weiter.</p>
-		${copyField('Adresse dieser Seite: nur für dich', personalUrl, {
+		<h2>Diese Seite ist nur für dich</h2>
+		<p>Setz dir ein Lesezeichen oder mail dir die Adresse, dann findest du sie auch auf einem anderen Gerät wieder. Gib sie nicht weiter.</p>
+		${copyField('Adresse dieser Seite', personalUrl, {
 			secret: true,
 			extra: html`<a class="button secondary" href="${personalMail(personalUrl)}">An mich mailen</a>`,
 		})}
