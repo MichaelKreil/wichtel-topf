@@ -69,12 +69,12 @@ async function show(page: Page, path: string): Promise<void> {
 			for (const el of document.querySelectorAll(selector)) (el.querySelector('mark') ?? el).textContent = text;
 		};
 		fill('.tag-value, .note td:first-child', 'Siebenschläfer');
-		fill('.note td + td', 'Carla Weiß');
+		fill('.note td:last-child', 'Carla Weiß');
 		// the own row's position depends on the random code name: always mark the first one instead
 		const marks = [...document.querySelectorAll('.note mark')];
 		for (const mark of marks) mark.replaceWith(mark.textContent ?? '');
 		if (marks.length > 0)
-			for (const cell of document.querySelectorAll('.note tbody tr:first-child td'))
+			for (const cell of document.querySelectorAll('.note tbody tr:first-child td:not(.arrow)'))
 				cell.replaceChildren(Object.assign(document.createElement('mark'), { textContent: cell.textContent }));
 		for (const input of document.querySelectorAll<HTMLInputElement>('.copy input'))
 			input.value = 'https://wichteltopf.de/Melbedin-abcdefgh';

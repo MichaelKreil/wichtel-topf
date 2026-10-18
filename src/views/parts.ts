@@ -69,18 +69,22 @@ export function copyField(label: string, url: string, { share, extra, secret }: 
 	</div>`;
 }
 
-/** All assignments as a handwritten note; the viewer's own row is highlighted. */
+/**
+ * All assignments as a handwritten note; the viewer's own row is highlighted.
+ * The arrow has its own column, so the "Für" heading sits above the names. Screen readers skip it.
+ */
 export function resultList(rows: ResultRow[], myCodeName?: string): Html {
+	const arrow = html`<td class="arrow" aria-hidden="true">→</td>`;
 	return html`<div class="note">
 		<table>
 			<thead>
-				<tr><th scope="col">Von</th><th scope="col">Für</th></tr>
+				<tr><th scope="col">Von</th><td class="arrow"></td><th scope="col">Für</th></tr>
 			</thead>
 			<tbody>
 				${rows.map((r) =>
 					r.codeName === myCodeName
-						? html`<tr><td><mark>${r.codeName}</mark></td><td><mark>${r.receiver}</mark></td></tr>`
-						: html`<tr><td>${r.codeName}</td><td>${r.receiver}</td></tr>`,
+						? html`<tr><td><mark>${r.codeName}</mark></td>${arrow}<td><mark>${r.receiver}</mark></td></tr>`
+						: html`<tr><td>${r.codeName}</td>${arrow}<td>${r.receiver}</td></tr>`,
 				)}
 			</tbody>
 		</table>

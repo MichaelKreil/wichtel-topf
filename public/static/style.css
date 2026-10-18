@@ -290,9 +290,10 @@ b {
 /* all results: a handwritten note on ruled paper */
 .note {
 	--line: 2.1rem;
+	/* paper above the first line; the ruling starts there, so every row sits on a line */
+	--top: 10px;
 	margin: 1.2rem 0 1.6rem;
-	/* the top margin is one ruled line, so every row sits on a line */
-	padding: var(--line) 18px 14px 46px;
+	padding: var(--top) 18px 14px 46px;
 	background:
 		linear-gradient(to right, transparent 32px, rgb(196 64 64 / 0.5) 32px 34px, transparent 34px),
 		repeating-linear-gradient(
@@ -301,6 +302,10 @@ b {
 			rgb(80 120 180 / 0.28) calc(var(--line) - 1px) var(--line)
 		),
 		var(--tag);
+	background-position:
+		0 0,
+		0 var(--top),
+		0 0;
 	border-radius: 3px;
 	box-shadow: 0 8px 18px -8px rgb(60 30 10 / 0.45);
 	transform: rotate(-0.6deg);
@@ -345,7 +350,7 @@ b {
 		padding-right: 10px;
 		background-position:
 			-14px 0,
-			0 0,
+			0 var(--top),
 			0 0;
 	}
 }
@@ -361,10 +366,12 @@ b {
 	margin-bottom: 0;
 }
 
-/* the arrow is decoration: screen readers skip it */
-.note td + td::before {
-	content: "→ " / "";
+/* the arrow column is as narrow as the arrow */
+.note .arrow {
+	width: 1px;
+	padding-right: 0.5em;
 	color: var(--ink-soft);
+	white-space: nowrap;
 }
 
 /* the viewer's own row, as if marked with a highlighter */
