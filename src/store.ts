@@ -5,6 +5,8 @@ import { pick, potId, randomToken, safeEqual } from './random.ts';
 export interface Pot {
 	id: string;
 	adminToken: string;
+	/** Optional, shown on every page of the pot; empty if none */
+	title: string;
 	theme: string;
 	/** Id of the code name list, see src/codenames.ts */
 	codeNameList: string;
@@ -35,6 +37,7 @@ export type CloseResult = { ok: true } | { ok: false; error: 'closed' | 'too-few
 
 export const MIN_PARTICIPANTS = 3;
 export const MAX_NAME_LENGTH = 100;
+export const MAX_TITLE_LENGTH = 60;
 
 /** Concurrent requests are resolved by retrying; this many attempts is plenty. */
 const MAX_ATTEMPTS = 5;
@@ -53,6 +56,10 @@ export function cleanName(input: unknown): string {
 		.slice(0, MAX_NAME_LENGTH);
 }
 
+export function cleanTitle(input: unknown): string {
+	return cleanName(input).slice(0, MAX_TITLE_LENGTH);
+}
+
 // Guard for writes: only change pots that are still open.
 const IS_OPEN = 'EXISTS (SELECT 1 FROM pots WHERE id = ? AND closed_at IS NULL)';
 
@@ -60,6 +67,7 @@ function toPot(row: Row): Pot {
 	return {
 		id: row.id as string,
 		adminToken: row.admin_token as string,
+		title: row.title as string,
 		theme: row.theme as string,
 		codeNameList: row.code_name_list as string,
 		version: row.version as number,
@@ -112,12 +120,13 @@ export class Store {
 		this.#now = now;
 	}
 
-	async createPot(theme: string, codeNameList: string): Promise<Pot> {
+	async createPot(theme: string, codeNameList: string, title = ''): Promise<Pot> {
 		for (;;) {
 			const now = this.#now();
 			const pot: Pot = {
 				id: potId(),
 				adminToken: randomToken(24),
+				title,
 				theme,
 				codeNameList,
 				version: 0,
@@ -127,9 +136,10 @@ export class Store {
 			};
 			const [inserted] = await this.#db.batch([
 				sql(
-					'INSERT OR IGNORE INTO pots (id, admin_token, theme, code_name_list, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+					'INSERT OR IGNORE INTO pots (id, admin_token, title, theme, code_name_list, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
 					pot.id,
 					pot.adminToken,
+					pot.title,
 					pot.theme,
 					pot.codeNameList,
 					now,
@@ -148,6 +158,11 @@ export class Store {
 	/** How many people fit into the pot: one per code name. */
 	maxParticipants(pot: Pot): number {
 		return this.#codeNamesFor(pot.codeNameList).length;
+	}
+
+	/** Sets or clears the title; allowed at any time, as it changes nothing about the draw. */
+	async setTitle(potId: string, title: string): Promise<void> {
+		await this.#db.batch([sql('UPDATE pots SET title = ?, updated_at = ? WHERE id = ?', title, this.#now(), potId)]);
 	}
 
 	isAdmin(pot: Pot, token: string): boolean {

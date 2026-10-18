@@ -1,11 +1,13 @@
 // The organiser's page, reachable only via the secret admin link.
 import { html } from 'hono/html';
-import { type Exclusion, MIN_PARTICIPANTS, type Participant } from '../store.ts';
+import { type Exclusion, MAX_TITLE_LENGTH, MIN_PARTICIPANTS, type Participant } from '../store.ts';
 import { type Html, layout, type Page } from './layout.ts';
 import { copyField, type ResultRow, resultList } from './parts.ts';
 
 export interface AdminPageProps {
 	page: Page;
+	/** The pot's title, empty if none */
+	title: string;
 	/** One per code name in the pot's list */
 	maxParticipants: number;
 	potUrl: string;
@@ -27,6 +29,24 @@ function linksMail(potUrl: string, adminUrl: string): string {
 	return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
+/** Sets the title; without one, the form asks for it, with one it's folded away. */
+function titleForm({ title, adminPath }: AdminPageProps): Html {
+	const form = html`<form method="post" action="${adminPath}/titel">
+		<label for="title">Titel des Topfs</label>
+		<input type="text" id="title" name="title" value="${title}" maxlength="${MAX_TITLE_LENGTH}" placeholder="z. B. Familie Müller 2026" autocomplete="off">
+		<button type="submit" class="secondary">Titel speichern</button>
+	</form>`;
+	return title
+		? html`<details class="title-form">
+		<summary>Titel ändern</summary>
+		${form}
+	</details>`
+		: html`<section class="title-form">
+		<p>Gib dem Topf einen Titel, damit niemand ihn mit einem anderen verwechselt. Er steht auf allen Seiten und in der Vorschau, wenn du den Link verschickst.</p>
+		${form}
+	</section>`;
+}
+
 export function adminPage(props: AdminPageProps): Html {
 	const { participants, exclusions, adminPath } = props;
 	const nameOf = new Map(participants.map((p) => [p.id, p.name]));
@@ -38,6 +58,8 @@ export function adminPage(props: AdminPageProps): Html {
 		'Admin',
 		html`<h1>${props.isNew ? 'Wichteltopf angelegt 🎉' : 'Dein Wichteltopf'}</h1>
 		${props.error ? html`<p class="error" role="alert">${props.error}</p>` : ''}
+
+		${titleForm(props)}
 
 		<section>
 			<p>Bitte speichere dir beide Links gut ab.</p>

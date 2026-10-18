@@ -6,7 +6,7 @@ import { secureHeaders } from 'hono/secure-headers';
 import { DEFAULT_LIST_ID, getCodeNameList } from './codenames.ts';
 import { safeEqual } from './random.ts';
 import type { RateLimiters } from './rate-limit.ts';
-import { canDraw, cleanName, type Participant, type Pot, type Store } from './store.ts';
+import { canDraw, cleanName, cleanTitle, type Participant, type Pot, type Store } from './store.ts';
 import { getTheme, randomTheme, themeOrDefault } from './themes.ts';
 import { adminPage } from './views/admin.ts';
 import type { Page } from './views/layout.ts';
@@ -41,9 +41,10 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 		return `${proto}://${c.req.header('host') ?? url.host}`;
 	};
 	// pots of retired designs get a current one
-	const page = (c: Context, theme: string = randomTheme().id): Page => ({
-		theme: themeOrDefault(theme).id,
+	const page = (c: Context, pot?: Pot): Page => ({
+		theme: themeOrDefault(pot?.theme ?? randomTheme().id).id,
 		origin: origin(c),
+		potTitle: pot?.title,
 	});
 	const notFound = (c: Context) =>
 		c.html(
@@ -108,7 +109,7 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 		const body = await c.req.parseBody();
 		const theme = getTheme(body.theme) ?? randomTheme();
 		const codeNames = getCodeNameList(body.codenames) ?? getCodeNameList(DEFAULT_LIST_ID);
-		const pot = await store.createPot(theme.id, codeNames?.id ?? DEFAULT_LIST_ID);
+		const pot = await store.createPot(theme.id, codeNames?.id ?? DEFAULT_LIST_ID, cleanTitle(body.title));
 		return c.redirect(`${adminPath(pot)}?neu`, 303);
 	});
 
@@ -134,8 +135,8 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 		const participants = await store.listParticipants(pot.id);
 		const me = findByToken(participants, getCookie(c, cookieName(pot)));
 		if (me) return c.redirect(personalPath(pot, me), 303);
-		if (pot.closedAt !== null) return c.html(resultPage(page(c, pot.theme), results(participants)));
-		return c.html(potPage({ page: page(c, pot.theme), potPath: potPath(pot), participants }));
+		if (pot.closedAt !== null) return c.html(resultPage(page(c, pot), results(participants)));
+		return c.html(potPage({ page: page(c, pot), potPath: potPath(pot), participants }));
 	});
 
 	app.get('/:pot/ich/:token', async (c) => {
@@ -147,7 +148,7 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 		rememberParticipant(c, pot, me);
 		return c.html(
 			personalPage({
-				page: page(c, pot.theme),
+				page: page(c, pot),
 				participant: me,
 				personalPath: personalPath(pot, me),
 				personalUrl: origin(c) + personalPath(pot, me),
@@ -167,7 +168,7 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 		await store.removeParticipant(pot, me.id);
 		deleteCookie(c, cookieName(pot), { path: '/' });
 		return c.html(
-			messagePage(page(c, pot.theme), 'Du bist ausgetragen', 'Dein Name wurde aus dem Wichteltopf gelöscht.', false),
+			messagePage(page(c, pot), 'Du bist ausgetragen', 'Dein Name wurde aus dem Wichteltopf gelöscht.', false),
 		);
 	});
 
@@ -180,7 +181,7 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 		const showError = async (error: string) =>
 			c.html(
 				potPage({
-					page: page(c, pot.theme),
+					page: page(c, pot),
 					potPath: potPath(pot),
 					participants: await store.listParticipants(pot.id),
 					error,
@@ -226,7 +227,8 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 		]);
 		return c.html(
 			adminPage({
-				page: page(c, pot.theme),
+				page: page(c, pot),
+				title: pot.title,
 				maxParticipants: store.maxParticipants(pot),
 				potUrl: origin(c) + potPath(pot),
 				adminUrl: origin(c) + adminPath(pot),
@@ -244,6 +246,11 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 	};
 
 	admin.get('/', (c) => renderAdmin(c, c.var.pot));
+
+	admin.post('/titel', async (c) => {
+		await store.setTitle(c.var.pot.id, cleanTitle((await c.req.parseBody()).title));
+		return c.redirect(adminPath(c.var.pot), 303);
+	});
 
 	admin.post('/entfernen', async (c) => {
 		const body = await c.req.parseBody();

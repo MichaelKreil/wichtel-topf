@@ -86,7 +86,9 @@ export interface DemoPot {
 }
 
 export async function createDemoPot(server: Server, demo: Demo): Promise<DemoPot> {
-	const adminPath = (await server.post('/neu', { theme: demo.theme, codenames: demo.codeNames })).replace(/\?.*/, '');
+	const adminPath = (
+		await server.post('/neu', { title: demo.title ?? '', theme: demo.theme, codenames: demo.codeNames })
+	).replace(/\?.*/, '');
 	const potPath = adminPath.replace(/\/admin\/.*/, '');
 	const personalPaths: string[] = [];
 	for (const name of demo.participants) personalPaths.push((await server.post(potPath, { name })).replace(/\?.*/, ''));

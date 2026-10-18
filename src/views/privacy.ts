@@ -18,7 +18,7 @@ export function privacyPage(page: Page): Html {
 
 		<h2>Welche Daten wir speichern</h2>
 		<ul>
-			<li><b>Wichteltopf:</b> das gewählte Design, Zeitpunkte von Erstellung und letzter Änderung sowie die geheimen Links.</li>
+			<li><b>Wichteltopf:</b> der Titel, falls einer eingegeben wurde, das gewählte Design, Zeitpunkte von Erstellung und letzter Änderung sowie die geheimen Links.</li>
 			<li><b>Teilnehmende:</b> der eingegebene Name, der zugeloste Codename und nach der Auslosung, wer wen beschenkt.</li>
 			<li><b>Ausschlüsse:</b> welche Teilnehmenden sich nicht gegenseitig ziehen sollen, festgelegt von der Person, die den Topf verwaltet.</li>
 		</ul>

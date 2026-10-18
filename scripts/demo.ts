@@ -1,5 +1,6 @@
 // Demo data for screenshots: one pot with five fake people.
 export interface Demo {
+	title?: string;
 	/** Background theme id from src/themes.ts */
 	theme: string;
 	/** Code name list id from src/codenames.ts */
@@ -10,6 +11,7 @@ export interface Demo {
 }
 
 export const DEMO: Demo = {
+	title: 'Familienwichteln 2026',
 	theme: 'snowman',
 	codeNames: 'waldtiere',
 	participants: ['Anna Schmidt', 'Ben Müller', 'Carla Weiß', 'David Fischer', 'Emma Wagner'],

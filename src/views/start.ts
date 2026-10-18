@@ -1,6 +1,7 @@
 // The start page: how it works, and the form to create a pot with code names and a background photo.
 import { html } from 'hono/html';
 import { CODE_NAME_LISTS, DEFAULT_LIST_ID } from '../codenames.ts';
+import { MAX_TITLE_LENGTH } from '../store.ts';
 import { TAGS, THEMES } from '../themes.ts';
 import { type Html, layout, type Page } from './layout.ts';
 import { giftTag } from './parts.ts';
@@ -27,6 +28,12 @@ export function startPage(page: Page): Html {
 		<p class="aside">Auch bekannt als Julklapp, Secret Santa oder „Engerl und Bengerl“. Kostenlos und ohne Anmeldung.</p>
 
 		<form method="post" action="/neu" class="create">
+			<section>
+				<h2><label for="title">Wie heißt euer Wichteln?</label></h2>
+				<input type="text" id="title" name="title" maxlength="${MAX_TITLE_LENGTH}" placeholder="z. B. Familie Müller 2026" autocomplete="off">
+				<p class="aside">Optional. Der Titel steht auf allen Seiten des Topfs und in der Vorschau, wenn du den Link verschickst. So verwechselt niemand zwei Töpfe.</p>
+			</section>
+
 			<fieldset class="lists">
 				<legend><h2>Wähle die Codenamen</h2></legend>
 				${CODE_NAME_LISTS.map(

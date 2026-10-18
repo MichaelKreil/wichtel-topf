@@ -75,7 +75,7 @@ export const test = base.extend<Fixtures>({
 /** Creates a pot directly over HTTP (faster than the form) and returns its links. */
 export async function createPot(
 	request: APIRequestContext,
-	{ theme, people = [] }: { theme?: string; people?: string[] } = {},
+	{ theme, title, people = [] }: { theme?: string; title?: string; people?: string[] } = {},
 ): Promise<{ potPath: string; adminPath: string; personalPaths: string[] }> {
 	const post = async (path: string, form: Record<string, string>) => {
 		const res = await request.post(path, {
@@ -86,7 +86,7 @@ export async function createPot(
 		expect(res.status(), `POST ${path}`).toBe(303);
 		return new URL(res.headers().location ?? '', 'http://x').pathname;
 	};
-	const adminPath = await post('/neu', theme ? { theme } : {});
+	const adminPath = await post('/neu', { ...(theme ? { theme } : {}), ...(title ? { title } : {}) });
 	const potPath = adminPath.replace(/\/admin\/.*/, '');
 	const personalPaths: string[] = [];
 	for (const name of people) personalPaths.push(await post(potPath, { name }));

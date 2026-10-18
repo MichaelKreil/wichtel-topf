@@ -164,6 +164,15 @@ b {
 	color: var(--ink-soft);
 }
 
+/* the pot's title, above the heading of every page of the pot */
+.kicker {
+	margin: 1.6rem 0 -1rem;
+	font-family: var(--display);
+	font-size: 1.05rem;
+	color: var(--ink-soft);
+	overflow-wrap: break-word;
+}
+
 .aside {
 	font-size: 0.9rem;
 	color: var(--ink-soft);
@@ -427,6 +436,7 @@ button.small {
 	text-wrap: balance;
 }
 
+.create section,
 .create fieldset,
 .create .form-end {
 	margin-top: 2rem;
@@ -623,4 +633,15 @@ footer a {
 	display: inline-block;
 	padding: 12px 0;
 	color: var(--ink-soft);
+}
+
+/* the title form on the admin page */
+.title-form label {
+	font-size: 0.95rem;
+}
+
+.title-form summary {
+	padding: 12px 0;
+	color: var(--ink-soft);
+	cursor: pointer;
 }

@@ -10,6 +10,8 @@ export type Html = HtmlEscapedString | Promise<HtmlEscapedString>;
 export interface Page {
 	theme: string;
 	origin: string;
+	/** The pot's title, on pages that belong to a pot; empty if the pot has none */
+	potTitle?: string;
 }
 
 interface LayoutOptions {
@@ -23,18 +25,19 @@ const DEFAULT_DESCRIPTION = 'Kostenloser Online-Wichteltopf: Namen eintragen, ge
 
 export function layout(page: Page, title: string, content: Html, options: LayoutOptions = {}): Html {
 	const description = options.description ?? DEFAULT_DESCRIPTION;
+	const potTitle = page.potTitle ?? '';
 	return html`<!doctype html>
 <html lang="de">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="referrer" content="no-referrer">
-	<title>${title} · Wichteltopf</title>
+	<title>${title} · ${potTitle ? `${potTitle} · ` : ''}Wichteltopf</title>
 	<meta name="description" content="${description}">
 	${options.index ? '' : html`<meta name="robots" content="noindex">`}
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="Wichteltopf">
-	<meta property="og:title" content="${title}">
+	<meta property="og:title" content="${potTitle ? `${potTitle} · ${title}` : title}">
 	<meta property="og:description" content="${description}">
 	<meta property="og:image" content="${page.origin}/static/og.jpg">
 	<meta property="og:image:width" content="1200">
@@ -51,6 +54,7 @@ export function layout(page: Page, title: string, content: Html, options: Layout
 </head>
 <body data-theme="${page.theme}">
 	<main>
+		${potTitle ? html`<p class="kicker">${potTitle}</p>` : ''}
 		${content}
 		<footer><a href="/datenschutz">Impressum und Datenschutz</a></footer>
 	</main>

@@ -470,6 +470,41 @@ describe('code name lists', () => {
 	});
 });
 
+describe('pot title', () => {
+	it('shows the title on every page of the pot, in the tab and in link previews', async () => {
+		const res = await post('/neu', { theme: 'tree1', title: '  Familie  Müller 2026 ' });
+		const adminPath = new URL(res.headers.get('location') ?? '', BASE).pathname;
+		const potPath = adminPath.replace(/\/admin\/.*/, '');
+		const anna = await join(potPath, 'Anna');
+		for (const path of [potPath, anna.personalPath, adminPath]) {
+			const html = await (await get(path)).text();
+			assert.match(html, /<p class="kicker">Familie Müller 2026<\/p>/, path);
+			assert.match(html, /<title>[^<]* · Familie Müller 2026 · Wichteltopf<\/title>/, path);
+			assert.match(html, /<meta property="og:title" content="Familie Müller 2026 · [^"]+">/, path);
+		}
+		assert.match(await (await get(adminPath)).text(), /<summary>Titel ändern<\/summary>/);
+		assert.doesNotMatch(await (await get('/')).text(), /kicker/);
+	});
+
+	it('is optional, and the admin can set or change it later', async () => {
+		const { potPath, adminPath } = await createPot();
+		let html = await (await get(adminPath)).text();
+		assert.doesNotMatch(html, /kicker/);
+		assert.match(html, /Gib dem Topf einen Titel/);
+
+		assert.equal((await post(`${adminPath}/titel`, { title: '<b>Büro</b>' })).status, 303);
+		html = await (await get(potPath)).text();
+		assert.match(html, /<p class="kicker">&lt;b&gt;Büro&lt;\/b&gt;<\/p>/, 'escaped');
+		assert.match(html, /<title>[^<]* · &lt;b&gt;Büro&lt;\/b&gt; · Wichteltopf<\/title>/);
+
+		await post(`${adminPath}/titel`, { title: 'x'.repeat(100) });
+		assert.equal((await store.getPot(potPath.slice(1)))?.title.length, 60);
+
+		await post(`${adminPath}/titel`, { title: '' });
+		assert.doesNotMatch(await (await get(potPath)).text(), /kicker/);
+	});
+});
+
 describe('background photos', () => {
 	it('shows pots of retired designs with a current photo', async () => {
 		const pot = await store.createPot('retired', DEFAULT_LIST_ID);
