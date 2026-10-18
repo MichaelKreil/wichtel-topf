@@ -3,3 +3,5 @@ database/
 *.sqlite*
 .wrangler/
 screenshots/
+# raw AI-generated originals, kept locally
+gemini*/
