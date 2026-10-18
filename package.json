@@ -40,7 +40,7 @@
 		"@types/node": "^26.6.5",
 		"npm-check-updates": "^23.1.1",
 		"typescript": "^7.0.2",
-		"wrangler": "^4.151.0"
+		"wrangler": "^4.151.1"
 	},
 	"allowScripts": {
 		"esbuild": true,
