@@ -75,7 +75,22 @@ export function adminPage(props: AdminPageProps): Html {
 				: ''
 		}
 
+		${
+			props.closed
+				? html`<section>
+			<h2>Die Ziehung ist abgeschlossen</h2>
+			<p>Sag jetzt allen Bescheid: Schick den Teilnahme-Link noch einmal herum. Mit ihm und dem eigenen Codenamen findet jede Person ihr Ergebnis, auch ohne persönlichen Link.</p>
+			${copyField('Teilnahme-Link: an alle Wichtel verschicken', props.potUrl, {
+				share: { label: 'Teilen', text: 'Die Auslosung ist fertig! Öffne den Link und such deinen Codenamen:' },
+			})}
+			${resultList(props.result ?? [])}
+		</section>
 		<section>
+			<h2>Dein Admin-Link</h2>
+			${copyField('Admin-Link: geheim! Nur damit kannst du den Topf verwalten.', props.adminUrl, { secret: true })}
+			<a class="button secondary" href="${linksMail(props.potUrl, props.adminUrl)}">Links an mich mailen</a>
+		</section>`
+				: html`<section>
 			<p>Bitte speichere dir beide Links gut ab.</p>
 			${copyField('Teilnahme-Link: an alle Wichtel verschicken', props.potUrl, {
 				share: { label: 'Teilen', text: 'Wir wichteln! Wirf hier deinen Namen in den Wichteltopf:' },
@@ -84,10 +99,12 @@ export function adminPage(props: AdminPageProps): Html {
 			<a class="button secondary" href="${linksMail(props.potUrl, props.adminUrl)}">Links an mich mailen</a>
 		</section>
 
-		${
-			props.closed
-				? html`<h2>Die Ziehung ist abgeschlossen</h2>${resultList(props.result ?? [])}`
-				: html`
+		<section>
+			<h2>Machst du selbst mit?</h2>
+			<p>Dann trag dich wie alle anderen über den Teilnahme-Link ein. Du bekommst dort deinen eigenen Codenamen. Als Admin siehst du nicht, wer welchen Codenamen hat, auch deinen eigenen nur auf deiner persönlichen Seite.</p>
+			<a class="button secondary" href="${props.potUrl}">Selbst mitmachen</a>
+		</section>
+
 		<section>
 			<h2>Im Topf (${participants.length} von max. ${props.maxParticipants})</h2>
 			${

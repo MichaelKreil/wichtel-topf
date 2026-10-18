@@ -117,8 +117,17 @@ describe('app', () => {
 		await join(potPath, 'Ben');
 		await join(potPath, 'Carla');
 
+		// the admin joins like everyone else
+		assert.ok(admin.includes(`<a class="button secondary" href="http://localhost${potPath}">Selbst mitmachen</a>`));
+
 		const closed = await post(`${adminPath}/schliessen`, {});
 		assert.equal(closed.status, 303);
+
+		// after the draw, the admin is told to send the group link around again
+		const adminResult = await (await get(adminPath)).text();
+		assert.match(adminResult, /Sag jetzt allen Bescheid/);
+		assert.match(adminResult, /data-share="Die Auslosung ist fertig![^"]*"/);
+		assert.doesNotMatch(adminResult, /Selbst mitmachen/);
 
 		const result = await (await get(anna.personalPath)).text();
 		assert.match(result, /Die Ziehung ist abgeschlossen/);
