@@ -108,11 +108,13 @@ describe('app', () => {
 		const result = await (await get(anna.personalPath)).text();
 		assert.match(result, /Die Ziehung ist abgeschlossen/);
 		assert.match(result, /Du beschenkst/);
-		assert.equal(result.match(/class="tag tag-small/g)?.length, 4);
+		assert.equal(result.match(/<td>/g)?.length, 8, 'a note with one row per participant');
+		assert.equal(result.match(/<mark>/g)?.length, 2, 'the own row is highlighted');
 
 		const publicResult = await (await get(potPath)).text();
 		assert.ok(!publicResult.includes('Du beschenkst'));
-		assert.equal(publicResult.match(/class="tag tag-small/g)?.length, 4);
+		assert.equal(publicResult.match(/<td>/g)?.length, 8);
+		assert.ok(!publicResult.includes('<mark>'));
 
 		// no more joining
 		assert.equal((await join(potPath, 'Dora')).res.status, 303);

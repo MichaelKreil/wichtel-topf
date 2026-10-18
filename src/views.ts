@@ -75,8 +75,8 @@ function joinNames(names: string[]): string {
  * A paper gift tag with a punched hole and string, written by hand: the signature element.
  * Each line is a label ("Von:", "Für:") and a value.
  */
-function giftTag(lines: [string, string][], size: 'big' | 'small' = 'big', mine = false): Html {
-	return html`<div class="tag tag-${size}${mine ? ' tag-mine' : ''}">
+function giftTag(lines: [string, string][]): Html {
+	return html`<div class="tag">
 		<div class="tag-paper">
 			${lines.map(([label, value]) => html`<span class="tag-line"><span class="tag-label">${label}</span> <span class="tag-value">${value}</span></span>`)}
 		</div>
@@ -374,21 +374,22 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 	);
 }
 
-/** All assignments as small gift tags; the viewer's own one is highlighted. */
+/** All assignments as a handwritten note; the viewer's own row is highlighted. */
 function resultList(rows: ResultRow[], myCodeName?: string): Html {
-	return html`<ul class="result">
-		${rows.map(
-			(r) =>
-				html`<li>${giftTag(
-					[
-						['Von:', r.codeName],
-						['Für:', r.receiver],
-					],
-					'small',
-					r.codeName === myCodeName,
-				)}</li>`,
-		)}
-	</ul>`;
+	return html`<div class="note">
+		<table>
+			<thead>
+				<tr><th scope="col">Von</th><th scope="col">Für</th></tr>
+			</thead>
+			<tbody>
+				${rows.map((r) =>
+					r.codeName === myCodeName
+						? html`<tr><td><mark>${r.codeName}</mark></td><td><mark>${r.receiver}</mark></td></tr>`
+						: html`<tr><td>${r.codeName}</td><td>${r.receiver}</td></tr>`,
+				)}
+			</tbody>
+		</table>
+	</div>`;
 }
 
 export function resultPage(page: Page, rows: ResultRow[]): Html {

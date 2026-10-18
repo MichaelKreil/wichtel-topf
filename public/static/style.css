@@ -263,49 +263,81 @@ b {
 	overflow-wrap: break-word;
 }
 
-.tag-small {
-	margin: 0.2rem 0 0.4rem 22px;
-}
-
-.tag-small::before {
-	/* scaled to 32x22: the end moves to (30.5, 16), the hole is at (13px, 50%) */
-	left: -17.5px;
-	top: calc(50% - 16px);
-	width: 32px;
-	height: 22px;
-}
-
-.tag-small .tag-paper {
-	padding: 6px 16px 8px 32px;
+/* all results: a handwritten note on ruled paper */
+.note {
+	--line: 2.1rem;
+	margin: 1.2rem 0 1.6rem;
+	/* the top margin is one ruled line, so every row sits on a line */
+	padding: var(--line) 18px 14px 46px;
 	background:
-		radial-gradient(circle at 13px 50%, transparent 0 3.5px, var(--card-edge) 3.5px 5px, transparent 5.5px), var(--tag);
-	clip-path: polygon(17px 0, 100% 0, 100% 100%, 17px 100%, 0 50%);
-	mask: radial-gradient(circle at 13px 50%, transparent 3.5px, #000 4px);
+		linear-gradient(to right, transparent 32px, rgb(196 64 64 / 0.5) 32px 34px, transparent 34px),
+		repeating-linear-gradient(
+			to bottom,
+			transparent 0 calc(var(--line) - 1px),
+			rgb(80 120 180 / 0.28) calc(var(--line) - 1px) var(--line)
+		),
+		var(--tag);
+	border-radius: 3px;
+	box-shadow: 0 8px 18px -8px rgb(60 30 10 / 0.45);
+	transform: rotate(-0.6deg);
+	font-family: var(--hand);
+	font-weight: 600;
 }
 
-.tag-small .tag-label {
-	font-size: 1rem;
+.note table {
+	width: 100%;
+	border-collapse: collapse;
 }
 
-.tag-small .tag-value {
-	font-size: 1.35rem;
+.note th,
+.note td {
+	padding: 0 0.3em 0 0;
+	line-height: var(--line);
+	text-align: left;
+	vertical-align: top;
+	/* long names break at syllables, so the columns stay as wide as their longest word */
+	hyphens: auto;
+	overflow-wrap: break-word;
 }
 
-.tag-mine .tag-paper {
-	background:
-		radial-gradient(circle at 13px 50%, transparent 0 3.5px, var(--card-edge) 3.5px 5px, transparent 5.5px), #ffe9a8;
+.note th {
+	font-size: 1.15rem;
+	font-weight: 600;
+	color: var(--ink-soft);
 }
 
-.result {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 2px 12px;
-	list-style: none;
-	padding: 0;
+.note td {
+	font-size: clamp(1.2rem, 5.6vw, 1.45rem);
 }
 
-.result li:nth-child(even) .tag {
-	transform: rotate(1.5deg);
+/* code names break only between words, the names of the people may also break at syllables */
+.note td:first-child {
+	hyphens: manual;
+}
+
+@media (max-width: 480px) {
+	.note {
+		padding-left: 32px;
+		padding-right: 10px;
+		background-position:
+			-14px 0,
+			0 0,
+			0 0;
+	}
+}
+
+/* the arrow is decoration: screen readers skip it */
+.note td + td::before {
+	content: "→ " / "";
+	color: var(--ink-soft);
+}
+
+/* the viewer's own row, as if marked with a highlighter */
+.note mark {
+	padding: 0 0.15em;
+	border-radius: 4px;
+	background: linear-gradient(transparent 20%, rgb(255 214 64 / 0.75) 20% 85%, transparent 85%);
+	color: inherit;
 }
 
 /* --- forms --- */
