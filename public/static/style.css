@@ -386,11 +386,23 @@ button.small {
 	font-size: 0.9rem;
 }
 
-/* keeps the main action reachable while scrolling through the choices */
-button.sticky {
-	position: sticky;
-	bottom: 16px;
-	box-shadow: 0 6px 18px rgb(0 0 0 / 0.35);
+/* the start page form: clearly separated steps, ending with the main action */
+.create fieldset,
+.create .form-end {
+	margin-top: 2rem;
+}
+
+.form-end {
+	/* keeps the heading's margin inside, so the gap matches the one above the fieldsets' headings */
+	display: flow-root;
+	text-align: center;
+	text-wrap: balance;
+}
+
+button.large {
+	margin: 0.5rem 0 0;
+	padding: 16px 40px;
+	font-size: 1.3rem;
 }
 
 .error {

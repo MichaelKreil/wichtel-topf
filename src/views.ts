@@ -115,7 +115,7 @@ export function startPage(page: Page): Html {
 		</ol>
 		<p class="aside">Auch bekannt als Julklapp, Secret Santa oder „Engerl und Bengerl“. Kostenlos und ohne Anmeldung.</p>
 
-		<form method="post" action="/neu">
+		<form method="post" action="/neu" class="create">
 			<fieldset class="lists">
 				<legend><h2>Wähle die Codenamen</h2></legend>
 				${CODE_NAME_LISTS.map(
@@ -145,7 +145,11 @@ export function startPage(page: Page): Html {
 					</label>`,
 				)}
 			</fieldset>
-			<button type="submit" class="sticky">Wichteltopf anlegen</button>
+			<section class="form-end">
+				<h2>Alles bereit?</h2>
+				<p>Du bekommst gleich den Teilnahme&#8209;Link für alle und deinen Admin&#8209;Link.</p>
+				<button type="submit" class="large">Wichteltopf anlegen</button>
+			</section>
 		</form>`,
 		{ index: true },
 	);
