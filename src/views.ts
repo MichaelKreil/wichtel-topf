@@ -291,7 +291,7 @@ export function potPage({ page, potPath, participants, error }: PotPageProps): H
 		html`<h1>Wichteltopf</h1>
 		${
 			names.length === 0
-				? html`<p>Sei die/der Erste beim Wichteln!</p>`
+				? html`<p>Noch ist niemand im Topf. Mach den Anfang!</p>`
 				: html`<p>${joinNames(names)} ${names.length === 1 ? 'macht' : 'machen'} bereits mit.</p>`
 		}
 		<form method="post" action="${potPath}">
@@ -410,7 +410,7 @@ export function privacyPage(page: Page): Html {
 			<li><b>Teilnehmende:</b> der eingegebene Name, der zugeloste Codename und nach der Auslosung, wer wen beschenkt.</li>
 			<li><b>Ausschlüsse:</b> welche Teilnehmenden sich nicht gegenseitig ziehen sollen, festgelegt von der Person, die den Topf verwaltet.</li>
 		</ul>
-		<p>Es gibt keine Benutzerkonten, kein Tracking, keine Analyse-Werkzeuge und keine Inhalte von anderen Anbietern.</p>
+		<p>Es gibt keine Anmeldung, kein Tracking, keine Analyse-Werkzeuge und keine eingebundenen Inhalte Dritter.</p>
 
 		<h2>Wer die Daten sieht</h2>
 		<p>Wer den Teilnahme-Link hat, sieht die Namen aller Teilnehmenden und nach der Auslosung die Liste „Codename beschenkt Name“. Wer den Admin-Link hat, sieht zusätzlich die Ausschlüsse, aber nicht, wer welchen Codenamen hat. Den eigenen Codenamen sieht nur, wer den persönlichen Link hat.</p>
@@ -425,7 +425,7 @@ export function privacyPage(page: Page): Html {
 		<p>Die Daten werden nur verarbeitet, um das Wichteln durchzuführen (Art. 6 Abs. 1 lit. b DSGVO), und zum Schutz des Dienstes vor Missbrauch (Art. 6 Abs. 1 lit. f DSGVO).</p>
 
 		<h2>Hosting</h2>
-		<p>Die Seite läuft bei Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA, als Auftragsverarbeiter. Die Datenbank liegt in der EU. Beim Ausliefern der Seite verarbeitet Cloudflare technisch bedingt auch IP-Adressen; für Übermittlungen in die USA stützt sich Cloudflare auf das EU-U.S. Data Privacy Framework und Standardvertragsklauseln.</p>
+		<p>Die Seite läuft bei Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA, im Rahmen einer Auftragsverarbeitung (Art. 28 DSGVO). Die Datenbank liegt in der EU. Beim Ausliefern der Seite verarbeitet Cloudflare technisch bedingt auch IP-Adressen; für Übermittlungen in die USA stützt sich Cloudflare auf das EU-U.S. Data Privacy Framework und Standardvertragsklauseln.</p>
 
 		<h2>Speicherdauer</h2>
 		<p>Wichteltöpfe werden 90 Tage nach der letzten Änderung automatisch gelöscht. Die Person mit dem Admin-Link kann den Topf jederzeit vorher löschen. Teilnehmende können sich bis zur Auslosung über ihren persönlichen Link selbst austragen. Gelöschte Daten können noch bis zu 7 Tage in Sicherungskopien enthalten sein.</p>

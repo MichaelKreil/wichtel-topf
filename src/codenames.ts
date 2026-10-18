@@ -91,7 +91,7 @@ const LISTS: CodeNameList[] = [
 	{
 		id: 'forschung',
 		tag: 'forschung',
-		label: 'Forscher*innen',
+		label: 'Forschende',
 		names: [
 			'Marie Curie',
 			'Ada Lovelace',
@@ -126,7 +126,7 @@ const LISTS: CodeNameList[] = [
 	},
 	{
 		id: 'schauspiel',
-		label: 'Schauspieler*innen',
+		label: 'Filmstars',
 		names: [
 			'Meryl Streep',
 			'Tom Hanks',
@@ -222,7 +222,7 @@ const LISTS: CodeNameList[] = [
 	{
 		id: 'musik',
 		tag: 'musik',
-		label: 'Musiker*innen',
+		label: 'Musikstars',
 		names: [
 			'Freddie Mercury',
 			'Nena',

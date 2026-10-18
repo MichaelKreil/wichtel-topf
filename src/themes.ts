@@ -206,7 +206,7 @@ export const THEMES: readonly Theme[] = [
 	},
 	{
 		id: 'lab',
-		label: 'Forscherlabor',
+		label: 'Labor',
 		color: '#39332a',
 		card: '#ece5de',
 		align: 'left',
@@ -214,7 +214,7 @@ export const THEMES: readonly Theme[] = [
 	},
 	{
 		id: 'lab-art',
-		label: 'Forscherlabor, gemalt',
+		label: 'Labor, gemalt',
 		color: '#7b6d64',
 		card: '#ece5de',
 		align: 'left',
