@@ -3,7 +3,7 @@ import { html } from 'hono/html';
 import { OPERATOR } from '../operator.ts';
 import { type Html, layout, type Page } from './layout.ts';
 
-export function privacyPage(page: Page): Html {
+export function privacyPage(page: Page, ttlDays: number): Html {
 	return layout(
 		page,
 		'Datenschutz',
@@ -40,7 +40,7 @@ export function privacyPage(page: Page): Html {
 		<p>Die Seite läuft bei Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA, im Rahmen einer Auftragsverarbeitung (Art. 28 DSGVO). Die Datenbank liegt in der EU. Beim Ausliefern der Seite verarbeitet Cloudflare technisch bedingt auch IP-Adressen; für Übermittlungen in die USA stützt sich Cloudflare auf das EU-U.S. Data Privacy Framework und Standardvertragsklauseln.</p>
 
 		<h2>Speicherdauer</h2>
-		<p>Wichteltöpfe werden 90 Tage nach der letzten Änderung automatisch gelöscht. Die Person mit dem Admin-Link kann den Topf jederzeit vorher löschen. Teilnehmende können sich bis zur Auslosung über ihren persönlichen Link selbst austragen. Gelöschte Daten können noch bis zu 7 Tage in Sicherungskopien enthalten sein.</p>
+		<p>Wichteltöpfe werden ${ttlDays} Tage nach der letzten Änderung automatisch gelöscht. Die Person mit dem Admin-Link kann den Topf jederzeit vorher löschen. Teilnehmende können sich bis zur Auslosung über ihren persönlichen Link selbst austragen. Gelöschte Daten können noch bis zu 7 Tage in Sicherungskopien enthalten sein.</p>
 
 		<h2>Deine Rechte</h2>
 		<p>Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung, auf Widerspruch und auf Datenübertragbarkeit. Wende dich dafür an die oben genannte E-Mail-Adresse. Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren.</p>

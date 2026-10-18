@@ -502,6 +502,26 @@ describe('code name lists', () => {
 	});
 });
 
+describe('deletion date', () => {
+	it('tells when a pot is deleted, on the start page and on the admin page', async () => {
+		// 2026-10-18 12:00 in Berlin; 90 days later is 2027-01-16
+		const now = Date.UTC(2026, 9, 18, 10);
+		const app = createApp({ store, now: () => now, potTtlDays: 90 });
+		const start = await (await app.request(`${BASE}/`)).text();
+		assert.match(start, /werbefrei, ohne Anmeldung und ohne E-Mail-Adresse/);
+		assert.match(start, /90 Tage nach der letzten Änderung automatisch gelöscht, frühestens also am 16\.01\.2027\./);
+
+		const pot = await new Store(new NodeDatabase(':memory:'), codeNamesFor, () => now).createPot('tree1', 'waldtiere');
+		const stored = new Store(new NodeDatabase(':memory:'), codeNamesFor, () => now);
+		const app2 = createApp({ store: stored, potTtlDays: 30 });
+		const created = await stored.createPot('tree1', 'waldtiere');
+		const admin = await (await app2.request(`${BASE}/${created.id}/admin/${created.adminToken}`)).text();
+		assert.match(admin, /wird der Topf am 17\.11\.2026 automatisch gelöscht/);
+		assert.ok(pot.updatedAt === now);
+		assert.match(await (await app2.request(`${BASE}/datenschutz`)).text(), /30 Tage nach der letzten Änderung/);
+	});
+});
+
 describe('result list filter', () => {
 	it('offers a filter field only for long lists', async () => {
 		const small = await createPot();

@@ -17,6 +17,8 @@ interface Env {
 
 const DAY = 24 * 60 * 60 * 1000;
 
+const ttlDays = (env: Env) => Number(env.POT_TTL_DAYS ?? 90);
+
 // Reused across requests within the same isolate
 let cached: { env: Env; store: Store; app: Hono } | undefined;
 
@@ -29,6 +31,7 @@ function setup(env: Env) {
 			rateLimiters: { create: bindingRateLimiter(env.CREATE_LIMITER), write: bindingRateLimiter(env.WRITE_LIMITER) },
 			// set by Cloudflare, can't be faked by clients
 			clientIp: (c) => c.req.header('cf-connecting-ip') ?? '',
+			potTtlDays: ttlDays(env),
 		});
 		cached = { env, store, app };
 	}
@@ -51,8 +54,7 @@ export default {
 
 	// Daily cron trigger (see wrangler.jsonc): delete inactive pots.
 	async scheduled(_controller: unknown, env: Env) {
-		const ttlDays = Number(env.POT_TTL_DAYS ?? 90);
-		const deleted = await setup(env).store.deleteInactiveSince(Date.now() - ttlDays * DAY);
+		const deleted = await setup(env).store.deleteInactiveSince(Date.now() - ttlDays(env) * DAY);
 		console.log(`deleted ${deleted} inactive pots`);
 	},
 };

@@ -49,7 +49,7 @@ const clientIp = (c: Context) =>
 	(config.trustProxy ? c.req.header('x-forwarded-for')?.split(',')[0]?.trim() : undefined) ??
 	getConnInfo(c).remote.address ??
 	'';
-app.route('/', createApp({ store, baseUrl: config.baseUrl, rateLimiters, clientIp }));
+app.route('/', createApp({ store, baseUrl: config.baseUrl, rateLimiters, clientIp, potTtlDays: config.potTtlDays }));
 
 async function cleanup(): Promise<void> {
 	const deleted = await store.deleteInactiveSince(Date.now() - config.potTtlDays * DAY);

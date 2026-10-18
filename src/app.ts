@@ -11,7 +11,7 @@ import { getTheme, randomTheme, themeOrDefault } from './themes.ts';
 import { adminPage } from './views/admin.ts';
 import type { Page } from './views/layout.ts';
 import { messagePage } from './views/message.ts';
-import type { ResultRow } from './views/parts.ts';
+import { deletionDate, type ResultRow } from './views/parts.ts';
 import { personalPage } from './views/personal.ts';
 import { potPage } from './views/pot.ts';
 import { privacyPage } from './views/privacy.ts';
@@ -25,12 +25,23 @@ export interface AppOptions {
 	rateLimiters?: RateLimiters;
 	/** The client's IP address for rate limiting. Depends on the runtime and proxy setup. */
 	clientIp?: (c: Context) => string;
+	/** Pots without activity are deleted after this many days (by the entry points); shown on the pages. */
+	potTtlDays?: number;
+	/** Current time, injectable for tests */
+	now?: () => number;
 }
 
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 
 /** The app without static file serving, which is done by Cloudflare or by src/server.ts. */
-export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }: AppOptions): Hono {
+export function createApp({
+	store,
+	baseUrl,
+	rateLimiters,
+	clientIp = () => '',
+	potTtlDays = 90,
+	now = Date.now,
+}: AppOptions): Hono {
 	const app = new Hono();
 
 	/** Public origin, e.g. "https://wichteln.example.org". Behind a proxy, BASEURL should be set. */
@@ -101,9 +112,9 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 
 	app.get('/healthz', (c) => c.text('ok'));
 
-	app.get('/', (c) => c.html(startPage(page(c))));
+	app.get('/', (c) => c.html(startPage(page(c), { ttlDays: potTtlDays, deletion: deletionDate(now(), potTtlDays) })));
 
-	app.get('/datenschutz', (c) => c.html(privacyPage(page(c))));
+	app.get('/datenschutz', (c) => c.html(privacyPage(page(c), potTtlDays)));
 
 	app.post('/neu', async (c) => {
 		const body = await c.req.parseBody();
@@ -240,6 +251,7 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 			adminPage({
 				page: page(c, pot),
 				title: pot.title,
+				deletion: deletionDate(pot.updatedAt, potTtlDays),
 				newLink: reissued && { name: reissued.name, url: origin(c) + personalPath(pot, reissued) },
 				maxParticipants: store.maxParticipants(pot),
 				potUrl: origin(c) + potPath(pot),

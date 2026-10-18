@@ -8,6 +8,8 @@ export interface AdminPageProps {
 	page: Page;
 	/** The pot's title, empty if none */
 	title: string;
+	/** The day the pot is deleted automatically, if nothing changes any more */
+	deletion: string;
 	/** A personal link the organiser just re-issued, to hand over to that participant */
 	newLink?: { name: string; url: string };
 	/** One per code name in the pot's list */
@@ -179,7 +181,7 @@ export function adminPage(props: AdminPageProps): Html {
 
 		<section>
 			<h2>Topf löschen</h2>
-			<p>Löscht alle Namen${props.closed ? ' und das Ergebnis' : ''} endgültig. Ungenutzte Töpfe werden nach 90 Tagen automatisch gelöscht.</p>
+			<p>Löscht alle Namen${props.closed ? ' und das Ergebnis' : ''} endgültig. Wenn sich nichts mehr ändert, wird der Topf am ${props.deletion} automatisch gelöscht.</p>
 			<form method="post" action="${adminPath}/loeschen" data-confirm="Den Wichteltopf mit allen Namen endgültig löschen?">
 				<button type="submit" class="secondary">Topf löschen</button>
 			</form>

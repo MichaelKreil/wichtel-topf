@@ -6,7 +6,13 @@ import { TAGS, THEMES } from '../themes.ts';
 import { type Html, layout, type Page } from './layout.ts';
 import { giftTag } from './parts.ts';
 
-export function startPage(page: Page): Html {
+export interface StartPageProps {
+	ttlDays: number;
+	/** The day a pot created now would be deleted, if nothing happens to it */
+	deletion: string;
+}
+
+export function startPage(page: Page, { ttlDays, deletion }: StartPageProps): Html {
 	return layout(
 		page,
 		'Wichteltopf anlegen',
@@ -25,7 +31,7 @@ export function startPage(page: Page): Html {
 			<li>Alle tragen sich ein und bekommen einen geheimen Codenamen.</li>
 			<li>Wenn alle dabei sind, schließt du den Topf. Jeder Codename bekommt eine Person, die er beschenkt.</li>
 		</ol>
-		<p class="aside">Auch bekannt als Julklapp, Secret Santa oder „Engerl und Bengerl“. Kostenlos und ohne Anmeldung.</p>
+		<p class="aside">Auch bekannt als Julklapp, Secret Santa oder „Engerl und Bengerl“. Kostenlos, werbefrei, ohne Anmeldung und ohne E-Mail-Adresse. Ein Topf wird ${ttlDays} Tage nach der letzten Änderung automatisch gelöscht, frühestens also am ${deletion}.</p>
 
 		<form method="post" action="/neu" class="create">
 			<section>

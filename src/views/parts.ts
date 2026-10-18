@@ -7,6 +7,23 @@ export interface ResultRow {
 	receiver: string;
 }
 
+const DAY = 24 * 60 * 60 * 1000;
+
+/** "16.01.2027", in German time */
+export function formatDate(ms: number): string {
+	return new Intl.DateTimeFormat('de-DE', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+		timeZone: 'Europe/Berlin',
+	}).format(ms);
+}
+
+/** The day a pot last changed at `updatedAt` is deleted, if nothing changes any more */
+export function deletionDate(updatedAt: number, ttlDays: number): string {
+	return formatDate(updatedAt + ttlDays * DAY);
+}
+
 /** "Anna", "Anna und Ben", "Anna, Ben und Carla" */
 export function joinNames(names: string[]): string {
 	if (names.length <= 1) return names.join('');
