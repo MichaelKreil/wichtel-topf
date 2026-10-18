@@ -133,10 +133,19 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 		const pot = await store.getPot(c.req.param('pot'));
 		if (!pot) return notFound(c);
 		const participants = await store.listParticipants(pot.id);
-		const me = findByToken(participants, getCookie(c, cookieName(pot)));
-		if (me) return c.redirect(personalPath(pot, me), 303);
-		if (pot.closedAt !== null) return c.html(resultPage(page(c, pot), results(participants)));
-		return c.html(potPage({ page: page(c, pot), potPath: potPath(pot), participants }));
+		// the browser remembers a participant: say so, but never redirect, so a shared device isn't stuck
+		const known = findByToken(participants, getCookie(c, cookieName(pot)));
+		const me = known && { name: known.name, personalPath: personalPath(pot, known) };
+		if (pot.closedAt !== null) return c.html(resultPage({ page: page(c, pot), rows: results(participants), me }));
+		return c.html(potPage({ page: page(c, pot), potPath: potPath(pot), participants, me }));
+	});
+
+	// "somebody else": the browser forgets the participant, who can come back with their personal link
+	app.post('/:pot/wechseln', async (c) => {
+		const pot = await store.getPot(c.req.param('pot'));
+		if (!pot) return notFound(c);
+		deleteCookie(c, cookieName(pot), { path: '/' });
+		return c.redirect(potPath(pot), 303);
 	});
 
 	app.get('/:pot/ich/:token', async (c) => {

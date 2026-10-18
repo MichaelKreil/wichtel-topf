@@ -226,7 +226,7 @@ export async function startBrowser(): Promise<Browser> {
 			await applyViewport();
 		},
 		async open(url) {
-			// personal pages set a cookie that would redirect the pot page
+			// personal pages set a cookie that changes what the pot page shows
 			await send('Network.clearBrowserCookies');
 			const loaded = new Promise<void>((resolve) => {
 				onLoad = resolve;

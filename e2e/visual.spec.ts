@@ -31,9 +31,11 @@ for (const [device, viewport] of [
 			['start', '/'],
 			['pot', open.potPath],
 			['personal', open.personalPaths[0] as string],
+			['pot-known', open.potPath], // after the personal page: the browser remembers the participant
 			['admin', open.adminPath],
 			['result', closed.potPath],
 			['personal-result', closed.personalPaths[0] as string],
+			['result-known', closed.potPath],
 			['admin-result', closed.adminPath],
 			['privacy', '/datenschutz'],
 			['not-found', '/Unbekannt-abcdefgh'],

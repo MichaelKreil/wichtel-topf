@@ -80,10 +80,20 @@ describe('app', () => {
 		assert.ok(anna.html.includes(encodeURIComponent(`http://localhost${anna.personalPath}`)), 'link in mail');
 		assert.match(anna.cookie, /^wichtel_/);
 
-		// returning with the cookie leads to the personal page
+		// returning with the cookie: the pot page knows Anna, but doesn't redirect (shared devices)
 		const back = await get(potPath, { Cookie: anna.cookie });
-		assert.equal(back.status, 303);
-		assert.equal(back.headers.get('location'), anna.personalPath);
+		assert.equal(back.status, 200);
+		const backHtml = await back.text();
+		assert.match(backHtml, /<h2>Du bist als Anna dabei<\/h2>/);
+		assert.ok(backHtml.includes(`href="${anna.personalPath}"`));
+		assert.ok(!backHtml.includes('name="name"'), 'no join form while the browser knows a participant');
+
+		// somebody else on the same device: the browser forgets Anna, who keeps her personal link
+		const forget = await post(`${potPath}/wechseln`, {}, { Cookie: anna.cookie });
+		assert.equal(forget.status, 303);
+		assert.match(forget.headers.get('set-cookie') ?? '', /Max-Age=0/);
+		assert.match(await (await get(potPath)).text(), /name="name"/);
+		assert.equal((await get(anna.personalPath)).status, 200);
 
 		// the personal link works without the cookie (other device) and remembers the browser
 		const elsewhere = await get(anna.personalPath);
@@ -115,6 +125,13 @@ describe('app', () => {
 		assert.ok(!publicResult.includes('Du beschenkst'));
 		assert.equal(publicResult.match(/<td>/g)?.length, 8);
 		assert.ok(!publicResult.includes('<mark>'));
+		assert.ok(!publicResult.includes('Du bist als'));
+
+		// with the cookie, the result page offers the own result, but shows the list to everyone
+		const knownResult = await (await get(potPath, { Cookie: anna.cookie })).text();
+		assert.match(knownResult, /Du bist als <b>Anna<\/b> dabei/);
+		assert.ok(knownResult.includes(`href="${anna.personalPath}"`));
+		assert.equal(knownResult.match(/<td>/g)?.length, 8);
 
 		// no more joining
 		assert.equal((await join(potPath, 'Dora')).res.status, 303);

@@ -145,3 +145,33 @@ test('links can be copied, and shared only where the device can share', async ({
 		.not.toBe('nothing');
 	if (browserName === 'chromium') expect(await anna.evaluate(() => navigator.clipboard.readText())).toBe(personalUrl);
 });
+
+test('a shared device shows who it remembers and lets somebody else join', async ({ page, person }) => {
+	await page.goto('/');
+	await page.getByRole('button', { name: 'Wichteltopf anlegen' }).click();
+	const potUrl = await page.getByLabel(/Teilnahme-Link/).inputValue();
+
+	const tablet = await person();
+	await tablet.goto(potUrl);
+	await tablet.getByLabel('Dein Vor- und Nachname').fill('Hilde');
+	await tablet.getByRole('button', { name: 'Mitmachen' }).click();
+	const hildesPage = tablet.url().replace(/\?.*/, '');
+
+	// the group link doesn't bounce to Hilde's page, it offers it
+	await tablet.goto(potUrl);
+	await expect(tablet.getByRole('heading', { name: 'Du bist als Hilde dabei' })).toBeVisible();
+	await expect(tablet.getByLabel('Dein Vor- und Nachname')).toHaveCount(0);
+	await tablet.getByRole('link', { name: 'Zu deiner Seite' }).click();
+	await expect(tablet.getByText('Du bist als Hilde im Topf')).toBeVisible();
+
+	// her husband uses the same tablet
+	await tablet.goto(potUrl);
+	await tablet.getByRole('button', { name: 'Jemand anderen eintragen' }).click();
+	await tablet.getByLabel('Dein Vor- und Nachname').fill('Walter');
+	await tablet.getByRole('button', { name: 'Mitmachen' }).click();
+	await expect(tablet.getByText('Du bist als Walter im Topf')).toBeVisible();
+
+	// Hilde's personal link still works
+	await tablet.goto(hildesPage);
+	await expect(tablet.getByText('Du bist als Hilde im Topf')).toBeVisible();
+});
