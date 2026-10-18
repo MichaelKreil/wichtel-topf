@@ -57,6 +57,66 @@ for (const [driver, createDb] of Object.entries(drivers)) {
 			assert.equal((await store.listParticipants(pot.id)).length, 4);
 		});
 
+		it('keeps the assignment complete when changes race with closing', async () => {
+			// requests interleave at every await; whatever wins, the stored result must be consistent
+			const after = async <T>(ticks: number, change: () => Promise<T>) => {
+				for (let i = 0; i < ticks; i++) await Promise.resolve();
+				return change();
+			};
+			for (let round = 0; round < 60; round++) {
+				const { store, pot, join } = await setup();
+				const [a, b, c] = [await join('A'), await join('B'), await join('C')];
+				const changes: (() => Promise<unknown>)[] = [
+					() => store.closePot(pot.id),
+					() => store.closePot(pot.id),
+					() => store.join(pot, 'D', undefined),
+					() => store.join(pot, 'E', undefined),
+					() => store.removeParticipant(pot, c.id),
+					() => store.addExclusion(pot, a.id, b.id),
+				];
+				// each change starts a few steps later, differently each round, so writes land between the
+				// reads and writes of closing
+				const outcomes = await Promise.allSettled(
+					changes.map((change, i) => after(Math.floor(round / 2 ** i) % 6, change)),
+				);
+				assert.ok(
+					outcomes.every((o) => o.status === 'fulfilled'),
+					`round ${round}: no request may fail`,
+				);
+
+				const closed = (await store.getPot(pot.id))?.closedAt !== null;
+				const participants = await store.listParticipants(pot.id);
+				const exclusions = await store.listExclusions(pot.id);
+				if (!closed) {
+					assert.ok(
+						participants.every((p) => p.receiverId === null),
+						`round ${round}: open pot without draw`,
+					);
+					continue;
+				}
+				const ids = participants.map((p) => p.id).sort();
+				const receivers = participants.map((p) => p.receiverId as number).sort();
+				assert.deepEqual(receivers, ids, `round ${round}: everyone in the pot gives and receives exactly once`);
+				for (const p of participants) assert.notEqual(p.receiverId, p.id, `round ${round}: nobody draws themselves`);
+				for (const { a: x, b: y } of exclusions) {
+					const receiverOf = new Map(participants.map((p) => [p.id, p.receiverId]));
+					assert.ok(
+						receiverOf.get(x) !== y && receiverOf.get(y) !== x,
+						`round ${round}: exclusion ${x}⟷${y} respected`,
+					);
+				}
+			}
+		});
+
+		it('closes only once when closed twice at the same time', async () => {
+			const { store, pot, join } = await setup();
+			for (const name of ['A', 'B', 'C', 'D']) await join(name);
+			const before = await Promise.all([store.closePot(pot.id), store.closePot(pot.id)]);
+			assert.deepEqual(before.map((r) => r.ok).sort(), [false, true], 'one wins, the other sees the pot closed');
+			const receivers = (await store.listParticipants(pot.id)).map((p) => p.receiverId);
+			assert.equal(new Set(receivers).size, 4);
+		});
+
 		it('removes participants together with their exclusions', async () => {
 			const { store, pot, join } = await setup();
 			const a = await join('A');
