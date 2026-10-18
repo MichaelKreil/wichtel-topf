@@ -40,6 +40,7 @@
 
 /* also for elements whose class sets a display */
 [hidden] {
+	/* biome-ignore lint/complexity/noImportantStyles: hidden must win over any class */
 	display: none !important;
 }
 
@@ -419,16 +420,16 @@ button.small {
 }
 
 /* the start page form: clearly separated steps, ending with the main action */
-.create fieldset,
-.create .form-end {
-	margin-top: 2rem;
-}
-
 .form-end {
 	/* keeps the heading's margin inside, so the gap matches the one above the fieldsets' headings */
 	display: flow-root;
 	text-align: center;
 	text-wrap: balance;
+}
+
+.create fieldset,
+.create .form-end {
+	margin-top: 2rem;
 }
 
 button.large {
