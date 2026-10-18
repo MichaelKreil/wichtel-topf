@@ -91,6 +91,24 @@ main {
 		0 22px 48px -18px rgb(0 0 0 / 0.55);
 }
 
+/* frosted glass: the photo shows through, blurred, so the card feels part of the picture */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+	main {
+		background: color-mix(in oklab, var(--card) 75%, transparent);
+		-webkit-backdrop-filter: blur(24px) saturate(1.4) brightness(1.4);
+		backdrop-filter: blur(24px) saturate(1.4) brightness(1.4);
+	}
+}
+
+/* only Chrome knows this setting so far, so it switches the glass off instead of on */
+@media (prefers-reduced-transparency: reduce) {
+	main {
+		background: var(--card);
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+	}
+}
+
 /* on wide screens, the card leaves room for the photo's motif */
 @media (min-width: 1000px) {
 	main {
@@ -213,8 +231,10 @@ b {
 	flex-direction: column;
 	padding: 12px 28px 14px 44px;
 	background:
-		radial-gradient(circle at 18px 50%, var(--card) 0 5px, var(--card-edge) 5px 6.5px, transparent 7px), var(--tag);
+		radial-gradient(circle at 18px 50%, transparent 0 5px, var(--card-edge) 5px 6.5px, transparent 7px), var(--tag);
 	clip-path: polygon(24px 0, 100% 0, 100% 100%, 24px 100%, 0 50%);
+	/* the hole is punched out, so the card shows through */
+	mask: radial-gradient(circle at 18px 50%, transparent 5px, #000 5.5px);
 	border-radius: 0 6px 6px 0;
 	font-family: var(--hand);
 	font-weight: 600;
@@ -258,8 +278,9 @@ b {
 .tag-small .tag-paper {
 	padding: 6px 16px 8px 32px;
 	background:
-		radial-gradient(circle at 13px 50%, var(--card) 0 3.5px, var(--card-edge) 3.5px 5px, transparent 5.5px), var(--tag);
+		radial-gradient(circle at 13px 50%, transparent 0 3.5px, var(--card-edge) 3.5px 5px, transparent 5.5px), var(--tag);
 	clip-path: polygon(17px 0, 100% 0, 100% 100%, 17px 100%, 0 50%);
+	mask: radial-gradient(circle at 13px 50%, transparent 3.5px, #000 4px);
 }
 
 .tag-small .tag-label {
@@ -272,7 +293,7 @@ b {
 
 .tag-mine .tag-paper {
 	background:
-		radial-gradient(circle at 13px 50%, var(--card) 0 3.5px, var(--card-edge) 3.5px 5px, transparent 5.5px), #ffe9a8;
+		radial-gradient(circle at 13px 50%, transparent 0 3.5px, var(--card-edge) 3.5px 5px, transparent 5.5px), #ffe9a8;
 }
 
 .result {
