@@ -4,8 +4,8 @@ What the Wichteltopf is, who uses it, and the rules behind its design. Read this
 how people identify themselves, what is shown to whom, or what the organiser can do. `README.md`
 covers how to run and deploy the code.
 
-Status: this document describes the target concept. The section "Gap to the current code" at the end
-lists what is not implemented yet.
+Status: implemented as described, as of October 2026. When the code and this document drift apart,
+fix one of them.
 
 ## Promise
 
@@ -35,8 +35,9 @@ to open.
 
 A pot has an **optional title**, for example "Familie Müller Weihnachten 2026" or "Team Backend".
 The title appears on every page of the pot, in the chat preview when the link is shared, and in the
-browser tab. It is the only way to tell two pots apart, so the admin page recommends setting one.
-Besides the title a pot has a background photo and a code name list, both chosen at creation.
+browser tab. It is the only way to tell two pots apart, so the admin page asks for one as long as
+there is none; it can be set or changed there at any time. Besides the title a pot has a background
+photo and a code name list, both chosen at creation and fixed afterwards.
 
 A pot is **open** until the organiser closes it. Closing performs the draw. After that no one can
 join or leave, and no assignment ever changes. If the group changes after the draw, the organiser
@@ -72,10 +73,12 @@ something whose loss is fatal.
 **Start page** explains the three steps and creates a pot: title, code name list, background photo.
 
 **Admin page** (admin link). Shows the title, the group link with a share button, the admin link,
-and a short explanation of what each link is for. The two links are visually distinct so they
-cannot be mixed up. Then the list of participants, the exclusions, the close button, and the delete
-button. After the draw it shows the result list and tells the organiser to send the group link
-around again so everyone can look up their result.
+and a short explanation of what each link is for. Secret links (admin, personal) carry a lock and a
+dashed red field, so they are not mixed up with the group link. Then a note that the organiser joins
+through the group link, the list of participants with "re-issue link" and "remove" for each, the
+exclusions, the close button, and the delete button. After the draw it leads with the result and
+tells the organiser to send the group link around again, with a share text that says the draw is
+done.
 
 **Group page** (group link, pot open). Shows the title and who has joined, and asks for a name. If
 the browser already knows a participant of this pot, the page says so ("Du bist als Anna dabei")
@@ -89,7 +92,8 @@ highlighted.
 
 **Result page** (group link, pot closed). Title, one sentence telling people to look for their
 code name, and the alphabetical list "code name gives to name". It is designed for exactly that
-search: large, sorted, and with a filter field for big pots.
+search: large, sorted, and with a filter field from nine rows on. If the browser remembers a
+participant, a button leads to their own result above the list.
 
 ## What the organiser can do about problems
 
@@ -138,20 +142,3 @@ and must be kept in line with this document.
   code name and receiver.
 - **Accounts and e-mail recovery.** They would solve the lost-link problem at the cost of the
   promise in the first section.
-
-## Gap to the current code
-
-As of October 2026 the code differs from this concept in these points:
-
-1. Pots have no title. Needs a migration, a field on the start page, and the title on every page
-   and in the Open Graph tags.
-2. The group link redirects silently to the personal page when the cookie matches. It should show
-   the "Du bist als … dabei" state with a way to join as somebody else.
-3. The personal page presents the personal link as the main thing to keep. It should present the
-   code name as the key and the link as a convenience, with the wording above.
-4. The organiser cannot re-issue a personal link. Needs an admin action that replaces the token
-   while the pot is open.
-5. The two links on the admin page look identical when truncated. They need a visible distinction.
-6. The admin page does not mention that the organiser joins through the group link, and after the
-   draw it does not tell them to send the group link around again.
-7. The result page has no filter field for large pots.

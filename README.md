@@ -2,7 +2,7 @@
 
 An online "Wichteltopf" (Secret Santa pot):
 
-1. The organiser creates a pot and gets two links: a **participation link** and a secret **admin link**.
+1. The organiser creates a pot, with an optional title, and gets two links: a **participation link** and a secret **admin link**.
 2. Participants open the participation link, enter their name and receive a secret **code name**.
 3. The organiser can remove participants and add **exclusions** (e.g. couples shouldn't draw each other).
 4. Closing the pot draws the assignment: one big circle where possible, so there are no "A ↔ B" pairs. The result page lists "code name → receiver" and is visible to everyone with the participation link. Each participant only knows their own code name.
