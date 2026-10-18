@@ -336,6 +336,17 @@ b {
 	}
 }
 
+/* filter field above long result lists, shown by app.js */
+.filter {
+	display: block;
+	margin-top: 1rem;
+	font-size: 0.95rem;
+}
+
+.filter input {
+	margin-bottom: 0;
+}
+
 /* the arrow is decoration: screen readers skip it */
 .note td + td::before {
 	content: "→ " / "";
@@ -363,6 +374,7 @@ legend {
 }
 
 input[type="text"],
+input[type="search"],
 select {
 	display: block;
 	width: 100%;
@@ -377,6 +389,7 @@ select {
 }
 
 input[type="text"]:focus,
+input[type="search"]:focus,
 select:focus {
 	border-color: var(--ink);
 }

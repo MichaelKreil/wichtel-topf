@@ -34,6 +34,23 @@ if (filter) {
 	}
 }
 
+// Filter on the result page: shows only the rows whose code name contains the typed text
+const rowFilter = document.querySelector('[data-filter-rows]');
+if (rowFilter) {
+	rowFilter.closest('.filter').hidden = false;
+	const empty = document.querySelector('[data-filter-empty]');
+	const rows = [...document.querySelectorAll('.note tbody tr')];
+	rowFilter.addEventListener('input', () => {
+		const needle = rowFilter.value.trim().toLowerCase();
+		let shown = 0;
+		for (const row of rows) {
+			row.hidden = !row.firstElementChild.textContent.toLowerCase().includes(needle);
+			if (!row.hidden) shown++;
+		}
+		empty.hidden = shown > 0;
+	});
+}
+
 // Share buttons for links, only where the device can share (mostly phones)
 for (const button of document.querySelectorAll('[data-share]')) {
 	if (!navigator.share) continue;

@@ -11,6 +11,7 @@ import { NodeDatabase } from '../src/db-node.ts';
 import { memoryRateLimiter } from '../src/rate-limit.ts';
 import { Store } from '../src/store.ts';
 import { TAGS, THEMES, themesCss } from '../src/themes.ts';
+import { FILTER_FROM } from '../src/views/result.ts';
 
 const BASE = 'http://localhost';
 let app: Hono;
@@ -498,6 +499,22 @@ describe('code name lists', () => {
 			const potId = new URL(res.headers.get('location') ?? '', BASE).pathname.split('/')[1] ?? '';
 			assert.equal((await store.getPot(potId))?.codeNameList, DEFAULT_LIST_ID);
 		}
+	});
+});
+
+describe('result list filter', () => {
+	it('offers a filter field only for long lists', async () => {
+		const small = await createPot();
+		for (const name of ['Anna', 'Ben', 'Carla']) await join(small.potPath, name);
+		await post(`${small.adminPath}/schliessen`, {});
+		assert.doesNotMatch(await (await get(small.potPath)).text(), /data-filter-rows/);
+
+		const large = await createPot();
+		for (let i = 0; i < FILTER_FROM; i++) await join(large.potPath, `Person ${i}`);
+		await post(`${large.adminPath}/schliessen`, {});
+		const html = await (await get(large.potPath)).text();
+		assert.match(html, /<label class="filter" hidden>Codename suchen<input type="search" data-filter-rows/);
+		assert.match(html, /data-filter-empty hidden/);
 	});
 });
 

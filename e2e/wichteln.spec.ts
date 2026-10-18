@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures.ts';
+import { createPot, expect, test } from './fixtures.ts';
 
 test('an organiser and four participants go through a whole round', async ({ page, person }) => {
 	// the organiser creates a pot
@@ -174,4 +174,28 @@ test('a shared device shows who it remembers and lets somebody else join', async
 	// Hilde's personal link still works
 	await tablet.goto(hildesPage);
 	await expect(tablet.getByText('Du bist als Hilde im Topf')).toBeVisible();
+});
+
+test('a long result list can be filtered by code name', async ({ page, request }) => {
+	const people = Array.from({ length: 12 }, (_, i) => `Person ${i + 1}`);
+	const { potPath, adminPath } = await createPot(request, { people });
+	await page.request.post(`${adminPath}/schliessen`, { headers: { 'Sec-Fetch-Site': 'same-origin' } });
+	await page.goto(potPath);
+	const rows = page.locator('.note tbody tr');
+	await expect(rows).toHaveCount(12);
+
+	const filter = page.getByLabel('Codename suchen');
+	await expect(filter, 'the filter appears with JavaScript').toBeVisible();
+	const first = (await rows.first().locator('td').first().textContent()) ?? '';
+	await filter.fill(first.slice(0, 3).toUpperCase());
+	await expect(rows.first()).toBeVisible();
+	expect(await page.locator('.note tbody tr:visible').count()).toBeLessThan(12);
+	await expect(page.getByText('Kein Codename passt')).toBeHidden();
+
+	await filter.fill('zzzzzz');
+	await expect(page.locator('.note tbody tr:visible')).toHaveCount(0);
+	await expect(page.getByText('Kein Codename passt')).toBeVisible();
+
+	await filter.fill('');
+	await expect(page.locator('.note tbody tr:visible')).toHaveCount(12);
 });
