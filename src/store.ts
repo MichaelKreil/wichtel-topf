@@ -305,8 +305,8 @@ export class Store {
 
 	/** Deletes pots without activity since `cutoff` (ms timestamp). Returns the number of deleted pots. */
 	async deleteInactiveSince(cutoff: number): Promise<number> {
-		const [deleted] = await this.#db.batch([sql('DELETE FROM pots WHERE updated_at < ?', cutoff)]);
-		return deleted ?? 0;
+		// counted with RETURNING: D1's change count would include the participants deleted along with the pots
+		return (await this.#db.all(sql('DELETE FROM pots WHERE updated_at < ? RETURNING id', cutoff))).length;
 	}
 
 	#touch(potId: string) {
