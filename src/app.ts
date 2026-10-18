@@ -234,10 +234,13 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 			store.listParticipants(pot.id),
 			store.listExclusions(pot.id),
 		]);
+		// a just re-issued personal link is shown once, to hand it over
+		const reissued = participants.find((p) => p.id === formId(c.req.query('link')));
 		return c.html(
 			adminPage({
 				page: page(c, pot),
 				title: pot.title,
+				newLink: reissued && { name: reissued.name, url: origin(c) + personalPath(pot, reissued) },
 				maxParticipants: store.maxParticipants(pot),
 				potUrl: origin(c) + potPath(pot),
 				adminUrl: origin(c) + adminPath(pot),
@@ -259,6 +262,13 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 	admin.post('/titel', async (c) => {
 		await store.setTitle(c.var.pot.id, cleanTitle((await c.req.parseBody()).title));
 		return c.redirect(adminPath(c.var.pot), 303);
+	});
+
+	admin.post('/neuer-link', async (c) => {
+		const body = await c.req.parseBody();
+		const participant = formId(body.participant);
+		const reissued = participant && (await store.reissueLink(c.var.pot, participant));
+		return c.redirect(`${adminPath(c.var.pot)}${reissued ? `?link=${reissued.id}` : ''}`, 303);
 	});
 
 	admin.post('/entfernen', async (c) => {

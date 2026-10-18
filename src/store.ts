@@ -233,6 +233,30 @@ export class Store {
 		throw new Error('too many concurrent joins');
 	}
 
+	/**
+	 * Replaces a participant's personal link while the pot is open, e.g. when the old one got lost.
+	 * The organiser learns nothing from the new link before the draw, as the page shows no receiver yet.
+	 * Returns the participant with the new token, or undefined if the pot is closed or the id unknown.
+	 */
+	async reissueLink(pot: Pot, participantId: number): Promise<Participant | undefined> {
+		const token = randomToken(24);
+		const [changed] = await this.#db.batch([
+			sql(
+				`UPDATE participants SET token = ? WHERE pot_id = ? AND id = ? AND ${IS_OPEN}`,
+				token,
+				pot.id,
+				participantId,
+				pot.id,
+			),
+			this.#touch(pot.id),
+		]);
+		if (changed !== 1) return undefined;
+		const row = await this.#db.first(
+			sql('SELECT * FROM participants WHERE pot_id = ? AND id = ?', pot.id, participantId),
+		);
+		return row && toParticipant(row);
+	}
+
 	async removeParticipant(pot: Pot, participantId: number): Promise<void> {
 		await this.#db.batch([
 			sql(`DELETE FROM participants WHERE pot_id = ? AND id = ? AND ${IS_OPEN}`, pot.id, participantId, pot.id),

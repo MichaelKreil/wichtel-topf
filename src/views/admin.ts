@@ -8,6 +8,8 @@ export interface AdminPageProps {
 	page: Page;
 	/** The pot's title, empty if none */
 	title: string;
+	/** A personal link the organiser just re-issued, to hand over to that participant */
+	newLink?: { name: string; url: string };
 	/** One per code name in the pot's list */
 	maxParticipants: number;
 	potUrl: string;
@@ -60,6 +62,17 @@ export function adminPage(props: AdminPageProps): Html {
 		${props.error ? html`<p class="error" role="alert">${props.error}</p>` : ''}
 
 		${titleForm(props)}
+		${
+			props.newLink
+				? html`<section class="notice">
+			<h2>Neuer Link für ${props.newLink.name}</h2>
+			<p>Der alte Link funktioniert nicht mehr. Schick diesen Link nur an ${props.newLink.name}, nicht an alle.</p>
+			${copyField(`Persönlicher Link für ${props.newLink.name}`, props.newLink.url, {
+				share: { label: 'Teilen', text: 'Dein neuer persönlicher Wichtel-Link (nicht weitergeben):' },
+			})}
+		</section>`
+				: ''
+		}
 
 		<section>
 			<p>Bitte speichere dir beide Links gut ab.</p>
@@ -83,13 +96,20 @@ export function adminPage(props: AdminPageProps): Html {
 				${participants.map(
 					(p) => html`<li>
 						<span>${p.name}</span>
-						<form method="post" action="${adminPath}/entfernen" data-confirm="${p.name} wirklich aus dem Topf entfernen?">
-							<input type="hidden" name="participant" value="${p.id}">
-							<button type="submit" class="small secondary">Entfernen</button>
-						</form>
+						<span class="actions">
+							<form method="post" action="${adminPath}/neuer-link" data-confirm="Neuen Link für ${p.name} erzeugen? Der alte funktioniert dann nicht mehr.">
+								<input type="hidden" name="participant" value="${p.id}">
+								<button type="submit" class="small secondary">Neuer Link</button>
+							</form>
+							<form method="post" action="${adminPath}/entfernen" data-confirm="${p.name} wirklich aus dem Topf entfernen?">
+								<input type="hidden" name="participant" value="${p.id}">
+								<button type="submit" class="small secondary">Entfernen</button>
+							</form>
+						</span>
 					</li>`,
 				)}
-			</ul>`
+			</ul>
+			<p class="aside">Vertippt? Entferne die Person, sie trägt sich neu ein. Link verloren? Ein neuer Link ersetzt den alten, der Codename bleibt. Beides geht nur bis zur Auslosung.</p>`
 			}
 		</section>
 

@@ -98,7 +98,7 @@ export async function createDemoPot(server: Server, demo: Demo): Promise<DemoPot
 	const idOf = new Map(
 		[
 			...adminHtml.matchAll(
-				/<span>([^<]+)<\/span>\s*<form[^>]*>\s*<input type="hidden" name="participant" value="(\d+)">/g,
+				/<li>\s*<span>([^<]+)<\/span>[\s\S]*?<input type="hidden" name="participant" value="(\d+)">/g,
 			),
 		].map((m) => [m[1] as string, m[2] as string]),
 	);

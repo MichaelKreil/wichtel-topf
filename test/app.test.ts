@@ -488,6 +488,44 @@ describe('code name lists', () => {
 	});
 });
 
+describe('re-issued personal links', () => {
+	it('lets the admin replace a lost link while the pot is open', async () => {
+		const { potPath, adminPath } = await createPot();
+		const anna = await join(potPath, 'Anna');
+		const [stored] = await store.listParticipants(potPath.slice(1));
+		assert.ok(stored);
+		const oldToken = anna.personalPath.split('/').pop() as string;
+
+		const res = await post(`${adminPath}/neuer-link`, { participant: String(stored.id) });
+		assert.equal(res.status, 303);
+		assert.equal(res.headers.get('location'), `${adminPath}?link=${stored.id}`);
+		const [updated] = await store.listParticipants(potPath.slice(1));
+		assert.ok(
+			updated && updated.token !== oldToken && updated.codeName === stored.codeName,
+			'new token, same code name',
+		);
+
+		// the new link is shown once, for handing over; the old link and the old cookie are dead
+		const html = await (await get(`${adminPath}?link=${stored.id}`)).text();
+		assert.match(html, /<h2>Neuer Link für Anna<\/h2>/);
+		assert.ok(html.includes(`http://localhost${potPath}/ich/${updated.token}`));
+		assert.ok(!html.includes(oldToken));
+		assert.ok(!(await (await get(adminPath)).text()).includes(updated.token), 'not without the query');
+		assert.equal((await get(anna.personalPath)).status, 404);
+		assert.match(await (await get(potPath, { Cookie: anna.cookie })).text(), /name="name"/);
+		assert.equal((await get(`${potPath}/ich/${updated.token}`)).status, 200);
+
+		// unknown ids and closed pots change nothing
+		assert.equal((await post(`${adminPath}/neuer-link`, { participant: '999' })).headers.get('location'), adminPath);
+		await join(potPath, 'Ben');
+		await join(potPath, 'Carla');
+		await post(`${adminPath}/schliessen`, {});
+		const closed = await post(`${adminPath}/neuer-link`, { participant: String(stored.id) });
+		assert.equal(closed.headers.get('location'), adminPath);
+		assert.equal((await store.listParticipants(potPath.slice(1)))[0]?.token, updated.token);
+	});
+});
+
 describe('pot title', () => {
 	it('shows the title on every page of the pot, in the tab and in link previews', async () => {
 		const res = await post('/neu', { theme: 'tree1', title: '  Familie  Müller 2026 ' });

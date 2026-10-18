@@ -586,6 +586,28 @@ button.large {
 	padding: 0;
 }
 
+.list .actions {
+	display: flex;
+	flex-shrink: 0;
+	gap: 6px;
+}
+
+.list .actions form {
+	margin: 0;
+}
+
+/* something to hand over, e.g. a re-issued link */
+.notice {
+	margin: 1rem 0;
+	padding: 4px 16px 12px;
+	border: 2px dashed var(--card-edge);
+	border-radius: var(--radius);
+}
+
+.notice h2 {
+	margin-top: 0.8rem;
+}
+
 .list li {
 	display: flex;
 	justify-content: space-between;
