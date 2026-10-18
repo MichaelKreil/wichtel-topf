@@ -43,7 +43,7 @@ Schema changes go into a new `migrations/NNNN_name.sql` file. Never edit an appl
 
 ### Adding a background photo
 
-1. Put the photo into `assets/backgrounds/<id>.jpg`.
+1. Put the photo into `assets/backgrounds/<id>.jpg`, or a finished 2560 px wide WebP (used as is) into `assets/backgrounds/<id>.webp`.
 2. Run `npm run images` (requires `cwebp`: `brew install webp`, and Google Chrome for the preview image and icons).
 3. Run `python3 scripts/theme-colors.py <id>` (requires Pillow) for the colors.
 4. Add `{ id, label, color, card, align }` to `src/themes.ts` and run `npm run assets`.

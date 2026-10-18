@@ -1,13 +1,18 @@
 #!/bin/sh
-# Generates the WebP backgrounds and thumbnails in public/static/img from the source JPGs in assets/backgrounds,
+# Generates the WebP backgrounds and thumbnails in public/static/img from the sources in assets/backgrounds,
 # and renders the link preview image (public/static/og.jpg) and the PNG icons with headless Chrome.
 # Requires cwebp (brew install webp), Google Chrome and sips (macOS).
 set -eu
 cd "$(dirname "$0")/.."
 mkdir -p public/static/img/bg public/static/img/thumb
-for src in assets/backgrounds/*.jpg; do
-	name=$(basename "$src" .jpg)
-	cwebp -quiet -q 72 -resize 2560 0 "$src" -o "public/static/img/bg/$name-lg.webp"
+# A JPG is a large photo that is compressed into all sizes. A WebP is already the large background
+# (2560 px wide, compressed once from the original): it is used as is, so it isn't compressed twice.
+for src in assets/backgrounds/*.jpg assets/backgrounds/*.webp; do
+	name=$(basename "${src%.*}")
+	case "$src" in
+	*.webp) cp "$src" "public/static/img/bg/$name-lg.webp" ;;
+	*) cwebp -quiet -q 72 -resize 2560 0 "$src" -o "public/static/img/bg/$name-lg.webp" ;;
+	esac
 	cwebp -quiet -q 70 -resize 1280 0 "$src" -o "public/static/img/bg/$name-sm.webp"
 	cwebp -quiet -q 75 -resize 384 0 "$src" -o "public/static/img/thumb/$name.webp"
 done
