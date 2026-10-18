@@ -69,6 +69,7 @@ export function adminPage(props: AdminPageProps): Html {
 			<p>Der alte Link funktioniert nicht mehr. Schick diesen Link nur an ${props.newLink.name}, nicht an alle.</p>
 			${copyField(`Persönlicher Link für ${props.newLink.name}`, props.newLink.url, {
 				share: { label: 'Teilen', text: 'Dein neuer persönlicher Wichtel-Link (nicht weitergeben):' },
+				secret: true,
 			})}
 		</section>`
 				: ''
@@ -79,7 +80,7 @@ export function adminPage(props: AdminPageProps): Html {
 			${copyField('Teilnahme-Link: an alle Wichtel verschicken', props.potUrl, {
 				share: { label: 'Teilen', text: 'Wir wichteln! Wirf hier deinen Namen in den Wichteltopf:' },
 			})}
-			${copyField('Admin-Link: geheim! Nur damit kannst du den Topf verwalten und schließen.', props.adminUrl)}
+			${copyField('Admin-Link: geheim! Nur damit kannst du den Topf verwalten und schließen.', props.adminUrl, { secret: true })}
 			<a class="button secondary" href="${linksMail(props.potUrl, props.adminUrl)}">Links an mich mailen</a>
 		</section>
 

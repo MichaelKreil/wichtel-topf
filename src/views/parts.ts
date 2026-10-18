@@ -30,12 +30,14 @@ interface CopyFieldOptions {
 	share?: { label: string; text: string };
 	/** Further actions after the copy button */
 	extra?: Html;
+	/** A link meant for one person only: marked with a lock, so it isn't mixed up with the group link */
+	secret?: boolean;
 }
 
 /** A link in a read-only field with a copy button, optionally with share and further actions. */
-export function copyField(label: string, url: string, { share, extra }: CopyFieldOptions = {}): Html {
-	return html`<div class="copy">
-		<label>${label}<input type="text" readonly value="${url}"></label>
+export function copyField(label: string, url: string, { share, extra, secret }: CopyFieldOptions = {}): Html {
+	return html`<div class="copy${secret ? ' secret' : ''}">
+		<label>${secret ? html`<span class="lock" aria-hidden="true">🔒</span> ` : ''}${label}<input type="text" readonly value="${url}"></label>
 		<div class="copy-actions">
 			${share ? html`<button type="button" data-share="${share.text}" hidden>${share.label}</button>` : ''}
 			<button type="button" class="secondary" data-copy>Kopieren</button>

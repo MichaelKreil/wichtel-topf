@@ -569,6 +569,17 @@ button.large {
 	text-overflow: ellipsis;
 }
 
+/* secret links (admin, personal) look different from the group link, so they aren't sent to everyone */
+.copy.secret input {
+	border-style: dashed;
+	border-color: var(--wax);
+	background: color-mix(in oklab, var(--field) 85%, var(--wax));
+}
+
+.secret label {
+	font-weight: 600;
+}
+
 .copy-actions {
 	display: flex;
 	flex-wrap: wrap;

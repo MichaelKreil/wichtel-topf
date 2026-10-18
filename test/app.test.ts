@@ -66,6 +66,9 @@ describe('app', () => {
 		assert.match(admin, /Wichteltopf angelegt/);
 		assert.match(admin, /data-theme="candle"/);
 		assert.ok(admin.includes(`http://localhost${potPath}`));
+		// the secret admin link is marked, the group link isn't
+		assert.match(admin, /<div class="copy secret">\s*<label><span class="lock"[^>]*>🔒<\/span> Admin-Link/);
+		assert.match(admin, /<div class="copy">\s*<label>Teilnahme-Link/);
 
 		const anna = await join(potPath, 'Anna');
 		assert.equal(anna.res.status, 303);
@@ -77,6 +80,7 @@ describe('app', () => {
 		// the personal link is for saving, not for sharing with others
 		assert.match(anna.html, /data-share="[^"]*nicht weitergeben[^"]*" hidden>Speichern</);
 		assert.doesNotMatch(anna.html, />Teilen</);
+		assert.match(anna.html, /<div class="copy secret">\s*<label><span class="lock"[^>]*>🔒<\/span> Persönlicher Link/);
 		assert.ok(anna.html.includes(`href="mailto:?subject=Mein%20Wichtel-Link&amp;body=`), 'mail to self');
 		assert.ok(anna.html.includes(encodeURIComponent(`http://localhost${anna.personalPath}`)), 'link in mail');
 		assert.match(anna.cookie, /^wichtel_/);

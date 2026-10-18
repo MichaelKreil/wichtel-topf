@@ -55,6 +55,7 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 		<p>Dieser Browser merkt sich, dass du ${participant.name} bist. Dein persönlicher Link öffnet deine Seite auch auf anderen Geräten, und nur damit kannst du dich wieder austragen. Gib ihn nicht weiter.</p>
 		${copyField('Persönlicher Link: nur für dich', personalUrl, {
 			share: { label: 'Speichern', text: 'Mein persönlicher Wichtel-Link (nicht weitergeben):' },
+			secret: true,
 			extra: html`<a class="button secondary" href="${personalMail(personalUrl)}">An mich mailen</a>`,
 		})}
 
