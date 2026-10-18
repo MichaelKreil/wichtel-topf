@@ -532,7 +532,8 @@ button.large {
 	gap: 8px;
 }
 
-.copy-actions button {
+.copy-actions button,
+.copy-actions .button {
 	margin: 0;
 }
 

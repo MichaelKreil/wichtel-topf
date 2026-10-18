@@ -73,6 +73,11 @@ describe('app', () => {
 		assert.match(anna.html, /Schön, dass du mitmachst/);
 		assert.match(anna.html, /Dein geheimer Codename lautet/);
 		assert.ok(anna.html.includes(`http://localhost${anna.personalPath}`));
+		// the personal link is for saving, not for sharing with others
+		assert.match(anna.html, /data-share="[^"]*nicht weitergeben[^"]*" hidden>Speichern</);
+		assert.doesNotMatch(anna.html, />Teilen</);
+		assert.ok(anna.html.includes(`href="mailto:?subject=Mein%20Wichtel-Link&amp;body=`), 'mail to self');
+		assert.ok(anna.html.includes(encodeURIComponent(`http://localhost${anna.personalPath}`)), 'link in mail');
 		assert.match(anna.cookie, /^wichtel_/);
 
 		// returning with the cookie leads to the personal page

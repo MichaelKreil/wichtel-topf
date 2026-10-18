@@ -84,12 +84,20 @@ function giftTag(lines: [string, string][], size: 'big' | 'small' = 'big', mine 
 }
 
 /** A link with copy button, and a share button (where the device supports it) if `shareText` is given. */
-function copyField(label: string, url: string, shareText?: string): Html {
+interface CopyFieldOptions {
+	/** Opens the device's share sheet (only shown where there is one), with this text before the link */
+	share?: { label: string; text: string };
+	/** Further actions after the copy button */
+	extra?: Html;
+}
+
+function copyField(label: string, url: string, { share, extra }: CopyFieldOptions = {}): Html {
 	return html`<div class="copy">
 		<label>${label}<input type="text" readonly value="${url}"></label>
 		<div class="copy-actions">
-			${shareText ? html`<button type="button" data-share="${shareText}" hidden>Teilen</button>` : ''}
+			${share ? html`<button type="button" data-share="${share.text}" hidden>${share.label}</button>` : ''}
 			<button type="button" class="secondary" data-copy>Kopieren</button>
+			${extra ?? ''}
 		</div>
 	</div>`;
 }
@@ -178,6 +186,13 @@ function linksMail(potUrl: string, adminUrl: string): string {
 	return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
+/** mailto: link with the personal link, to keep it in the participant's own mailbox */
+function personalMail(personalUrl: string): string {
+	const subject = 'Mein Wichtel-Link';
+	const body = `Mein persönlicher Wichtel-Link (nicht weitergeben):\n${personalUrl}\n`;
+	return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 export function adminPage(props: AdminPageProps): Html {
 	const { participants, exclusions, adminPath } = props;
 	const nameOf = new Map(participants.map((p) => [p.id, p.name]));
@@ -192,7 +207,9 @@ export function adminPage(props: AdminPageProps): Html {
 
 		<section>
 			<p>Bitte speichere dir beide Links gut ab.</p>
-			${copyField('Teilnahme-Link: an alle Wichtel verschicken', props.potUrl, 'Wir wichteln! Wirf hier deinen Namen in den Wichteltopf:')}
+			${copyField('Teilnahme-Link: an alle Wichtel verschicken', props.potUrl, {
+				share: { label: 'Teilen', text: 'Wir wichteln! Wirf hier deinen Namen in den Wichteltopf:' },
+			})}
 			${copyField('Admin-Link: geheim! Nur damit kannst du den Topf verwalten und schließen.', props.adminUrl)}
 			<a class="button secondary" href="${linksMail(props.potUrl, props.adminUrl)}">Links an mich mailen</a>
 		</section>
@@ -343,8 +360,11 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 		${giftTag([['Von:', participant.codeName]])}
 		<p>Verrate ihn niemandem! Nach der Auslosung steht hier, für wen dein Geschenk ist.</p>
 		<h2>Dein persönlicher Link</h2>
-		<p>Speichere dir diesen Link. Damit siehst du jederzeit deinen Codenamen und nach der Auslosung, wen du beschenkst, auch auf einem anderen Gerät.</p>
-		${copyField('Persönlicher Link: nur für dich', personalUrl, 'Mein persönlicher Wichtel-Link:')}
+		<p>Mit diesem Link siehst du jederzeit deinen Codenamen und nach der Auslosung, wen du beschenkst, auch auf einem anderen Gerät. Setz dir am besten ein Lesezeichen oder schick ihn dir selbst. Gib ihn nicht weiter.</p>
+		${copyField('Persönlicher Link: nur für dich', personalUrl, {
+			share: { label: 'Speichern', text: 'Mein persönlicher Wichtel-Link (nicht weitergeben):' },
+			extra: html`<a class="button secondary" href="${personalMail(personalUrl)}">An mich mailen</a>`,
+		})}
 
 		<h2>Doch nicht dabei?</h2>
 		<p>Bis zur Auslosung kannst du dich wieder austragen. Dein Name wird dann gelöscht.</p>
