@@ -68,6 +68,12 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 			referrerPolicy: 'no-referrer',
 		}),
 	);
+	// Pages contain names, code names and admin links: never store them in any cache
+	// (registered early, so it also covers the error pages of the checks below).
+	app.use(async (c, next) => {
+		await next();
+		if (c.res.headers.get('Content-Type')?.startsWith('text/html')) c.header('Cache-Control', 'no-store');
+	});
 	// CSRF protection: every form submission must come from our own pages. Browsers send Sec-Fetch-Site,
 	// older ones at least Origin. Requests with neither are rejected.
 	app.use(async (c, next) => {
@@ -81,11 +87,6 @@ export function createApp({ store, baseUrl, rateLimiters, clientIp = () => '' }:
 		);
 	});
 	app.use(bodyLimit({ maxSize: 16 * 1024 }));
-	// Pages contain names, code names and admin links: never store them in any cache.
-	app.use(async (c, next) => {
-		await next();
-		if (c.res.headers.get('Content-Type')?.startsWith('text/html')) c.header('Cache-Control', 'no-store');
-	});
 	app.use(async (c, next) => {
 		if (c.req.method !== 'POST' || !rateLimiters) return next();
 		const ip = clientIp(c);
