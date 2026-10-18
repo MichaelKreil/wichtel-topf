@@ -4,7 +4,7 @@ import { ASSET_VERSION } from './asset-version.ts';
 import { CODE_NAME_LISTS, DEFAULT_LIST_ID } from './codenames.ts';
 import { OPERATOR } from './operator.ts';
 import { type Exclusion, MAX_NAME_LENGTH, MIN_PARTICIPANTS, type Participant } from './store.ts';
-import { THEMES, themeOrDefault } from './themes.ts';
+import { TAGS, THEMES, themeOrDefault } from './themes.ts';
 
 type Html = HtmlEscapedString | Promise<HtmlEscapedString>;
 
@@ -120,7 +120,7 @@ export function startPage(page: Page): Html {
 				<legend><h2>Wähle die Codenamen</h2></legend>
 				${CODE_NAME_LISTS.map(
 					(list) => html`<label>
-						<input type="radio" name="codenames" value="${list.id}" ${list.id === DEFAULT_LIST_ID ? 'checked' : ''}>
+						<input type="radio" name="codenames" value="${list.id}"${list.id === DEFAULT_LIST_ID ? ' checked' : ''}${list.tag ? html` data-tag="${list.tag}"` : ''}>
 						<span>
 							<b>${list.label}</b> <span class="capacity">bis zu ${list.names.length} Personen</span><br>
 							<small>z.&nbsp;B. ${list.names.slice(0, 3).join(', ')}</small>
@@ -131,8 +131,15 @@ export function startPage(page: Page): Html {
 
 			<fieldset class="themes">
 				<legend><h2>Wähle ein Hintergrundbild</h2></legend>
+				<label class="theme-filter" hidden>
+					Zeige
+					<select data-theme-filter>
+						<option value="">alle Bilder</option>
+						${TAGS.map((tag) => html`<option value="${tag.id}">${tag.label}</option>`)}
+					</select>
+				</label>
 				${THEMES.map(
-					(t) => html`<label>
+					(t) => html`<label class="theme" data-tags="${t.tags.join(' ')}">
 						<input type="radio" name="theme" value="${t.id}" ${t.id === page.theme ? 'checked' : ''}>
 						<img class="swatch" src="/static/img/thumb/${t.id}.webp" alt="${t.label}" width="384" height="256" loading="lazy">
 					</label>`,

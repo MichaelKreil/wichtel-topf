@@ -1,15 +1,19 @@
 // Lists of secret code names. A list's size is also the maximum number of participants in a pot using it.
+import type { TagId } from './themes.ts';
 
 export interface CodeNameList {
 	id: string;
 	label: string;
 	/** The first three are shown as examples when choosing a list. */
 	names: readonly string[];
+	/** Backgrounds that fit the list: choosing the list sets the picker's filter to this tag */
+	tag?: TagId;
 }
 
 const LISTS: CodeNameList[] = [
 	{
 		id: 'maerchen',
+		tag: 'maerchen',
 		label: 'Märchenfiguren',
 		names: [
 			'Rotkäppchen',
@@ -43,6 +47,7 @@ const LISTS: CodeNameList[] = [
 	},
 	{
 		id: 'waldtiere',
+		tag: 'waldtiere',
 		label: 'Waldtiere',
 		names: [
 			'Fuchs',
@@ -85,6 +90,7 @@ const LISTS: CodeNameList[] = [
 	},
 	{
 		id: 'forschung',
+		tag: 'forschung',
 		label: 'Forscher*innen',
 		names: [
 			'Marie Curie',
@@ -215,6 +221,7 @@ const LISTS: CodeNameList[] = [
 	},
 	{
 		id: 'musik',
+		tag: 'musik',
 		label: 'Musiker*innen',
 		names: [
 			'Freddie Mercury',
@@ -269,6 +276,7 @@ const LISTS: CodeNameList[] = [
 	},
 	{
 		id: 'startrek',
+		tag: 'weltraum',
 		label: 'Star Trek',
 		names: [
 			'Spock',
@@ -319,6 +327,7 @@ const LISTS: CodeNameList[] = [
 	},
 	{
 		id: 'mittelerde',
+		tag: 'maerchen',
 		label: 'Mittelerde',
 		names: [
 			'Gandalf',

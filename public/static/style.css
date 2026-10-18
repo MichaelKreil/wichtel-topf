@@ -38,8 +38,9 @@
 	box-sizing: border-box;
 }
 
+/* also for elements whose class sets a display */
 [hidden] {
-	display: none;
+	display: none !important;
 }
 
 html {
@@ -416,7 +417,7 @@ button.sticky {
 	color: var(--ink-soft);
 }
 
-/* wrapping paper picker */
+/* background picker */
 .themes {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
@@ -427,7 +428,23 @@ button.sticky {
 	grid-column: 1 / -1;
 }
 
-.themes label {
+/* filter by tag, shown by app.js */
+.theme-filter {
+	grid-column: 1 / -1;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.theme-filter select {
+	width: auto;
+	min-width: 0;
+	flex: 1;
+	max-width: 18rem;
+	margin: 0;
+}
+
+.theme {
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -435,7 +452,7 @@ button.sticky {
 	cursor: pointer;
 }
 
-.themes input {
+.theme input {
 	position: absolute;
 	opacity: 0;
 }
@@ -450,12 +467,12 @@ button.sticky {
 	background: var(--paper-color);
 }
 
-.themes input:checked + .swatch {
+.theme input:checked + .swatch {
 	outline: 3px solid var(--ink);
 	outline-offset: 2px;
 }
 
-.themes input:focus-visible + .swatch {
+.theme input:focus-visible + .swatch {
 	outline: 3px solid var(--wax);
 	outline-offset: 2px;
 }

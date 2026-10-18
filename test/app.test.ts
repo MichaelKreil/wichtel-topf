@@ -10,7 +10,7 @@ import { codeNamesFor, DEFAULT_LIST_ID, getCodeNameList } from '../src/codenames
 import { NodeDatabase } from '../src/db-node.ts';
 import { memoryRateLimiter } from '../src/rate-limit.ts';
 import { Store } from '../src/store.ts';
-import { THEMES, themesCss } from '../src/themes.ts';
+import { TAGS, THEMES, themesCss } from '../src/themes.ts';
 
 const BASE = 'http://localhost';
 let app: Hono;
@@ -353,5 +353,25 @@ describe('background photos', () => {
 		const html = await (await get('/')).text();
 		for (const theme of THEMES)
 			assert.ok(html.includes(`src="/static/img/thumb/${theme.id}.webp" alt="${theme.label}"`), theme.id);
+	});
+
+	it('every photo has a tag, and every tag has photos', () => {
+		for (const theme of THEMES) assert.ok(theme.tags.length, theme.id);
+		for (const tag of TAGS)
+			assert.ok(
+				THEMES.some((theme) => theme.tags.includes(tag.id)),
+				tag.id,
+			);
+	});
+
+	it('offers a filter by tag, preset by the code name list', async () => {
+		const html = await (await get('/')).text();
+		for (const tag of TAGS)
+			assert.ok(html.includes(`<option value="${tag.id}">${tag.label.replace('&', '&amp;')}</option>`), tag.id);
+		assert.match(
+			html,
+			/<label class="theme" data-tags="waldtiere winter">\s*<input type="radio" name="theme" value="hare"/,
+		);
+		assert.match(html, /value="startrek" data-tag="weltraum">/);
 	});
 });
