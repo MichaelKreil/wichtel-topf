@@ -1,22 +1,25 @@
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { after, describe, it } from 'node:test';
 import type { Database } from '../src/db.ts';
 import { D1Database } from '../src/db-d1.ts';
 import { NodeDatabase } from '../src/db-node.ts';
 import { canDraw, cleanName, Store } from '../src/store.ts';
 import { fakeD1 } from './fake-d1.ts';
+import { stopWorkerd, workerdD1 } from './workerd-d1.ts';
 
 const CODE_NAMES = ['Ada', 'Bob', 'Cleo', 'Dan', 'Eve', 'Finn'];
 
-const drivers: Record<string, () => Database> = {
+const drivers: Record<string, () => Database | Promise<Database>> = {
 	'node:sqlite': () => new NodeDatabase(':memory:'),
-	D1: () => new D1Database(fakeD1()),
+	'D1 stand-in': () => new D1Database(fakeD1()),
+	'D1 in workerd': async () => new D1Database(await workerdD1()),
 };
+after(stopWorkerd);
 
 for (const [driver, createDb] of Object.entries(drivers)) {
 	describe(`Store (${driver})`, () => {
 		async function setup(now = () => 1000) {
-			const store = new Store(createDb(), () => CODE_NAMES, now);
+			const store = new Store(await createDb(), () => CODE_NAMES, now);
 			const pot = await store.createPot('tree1', 'test');
 			const join = async (name: string, token?: string) => {
 				const result = await store.join(pot, name, token);
