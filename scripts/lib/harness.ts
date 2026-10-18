@@ -182,6 +182,10 @@ export async function startBrowser(): Promise<Browser> {
 	sessionId = ((await send('Target.attachToTarget', { targetId, flatten: true })) as { sessionId: string }).sessionId;
 	await send('Page.enable');
 	await send('Emulation.setTouchEmulationEnabled', { enabled: true });
+	// headless Chrome reports reduced transparency, which would hide the frosted glass card
+	const mediaFeatures = [{ name: 'prefers-reduced-transparency', value: 'no-preference' }];
+	const applyMedia = () => send('Emulation.setEmulatedMedia', { features: mediaFeatures });
+	await applyMedia();
 
 	let viewport = { width: 390, height: 844, deviceScaleFactor: 2 };
 	const applyViewport = (height = viewport.height) =>
@@ -209,7 +213,8 @@ export async function startBrowser(): Promise<Browser> {
 
 	return {
 		async reduceMotion() {
-			await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+			mediaFeatures.push({ name: 'prefers-reduced-motion', value: 'reduce' });
+			await applyMedia();
 		},
 		async setViewport(width, height, deviceScaleFactor = 2) {
 			viewport = { width, height, deviceScaleFactor };
