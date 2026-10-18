@@ -25,10 +25,10 @@ export function privacyPage(page: Page, ttlDays: number): Html {
 		<p>Es gibt keine Anmeldung, kein Tracking, keine Analyse-Werkzeuge und keine eingebundenen Inhalte Dritter.</p>
 
 		<h2>Wer die Daten sieht</h2>
-		<p>Wer den Teilnahme-Link hat, sieht die Namen aller Teilnehmenden und nach der Auslosung die Liste „Codename beschenkt Name“. Wer den Admin-Link hat, sieht zusätzlich die Ausschlüsse, aber nicht, wer welchen Codenamen hat. Den eigenen Codenamen sieht nur, wer den persönlichen Link hat.</p>
+		<p>Wer den Teilnahme-Link hat, sieht den Titel, die Namen aller Teilnehmenden und nach der Auslosung die Liste „Codename beschenkt Name“. Wer den Admin-Link hat, sieht zusätzlich die Ausschlüsse, aber nicht, wer welchen Codenamen hat. Den eigenen Codenamen sieht nur, wer den persönlichen Link hat. Erzeugt die Person mit dem Admin-Link vor der Auslosung einen neuen persönlichen Link für jemanden, kann sie damit dessen Codenamen sehen.</p>
 
 		<h2>Cookie</h2>
-		<p>Nach dem Eintragen speichern wir ein Cookie mit deinem persönlichen Zugangsschlüssel, damit dich der Teilnahme-Link wiedererkennt. Es ist für diese Funktion technisch notwendig (§ 25 Abs. 2 Nr. 2 TDDDG) und wird nach einem Jahr oder beim Austragen gelöscht.</p>
+		<p>Nach dem Eintragen speichern wir ein Cookie mit deinem persönlichen Zugangsschlüssel, damit dich der Teilnahme-Link wiedererkennt. Es ist für diese Funktion technisch notwendig (§ 25 Abs. 2 Nr. 2 TDDDG) und wird nach einem Jahr, beim Austragen oder über „Jemand anderen eintragen“ gelöscht.</p>
 
 		<h2>IP-Adressen</h2>
 		<p>Zum Schutz vor Missbrauch wird die IP-Adresse beim Absenden eines Formulars für eine Minute zur Begrenzung der Anfragen verwendet. Wir speichern keine Zugriffsprotokolle mit IP-Adressen.</p>
@@ -43,7 +43,8 @@ export function privacyPage(page: Page, ttlDays: number): Html {
 		<p>Wichteltöpfe werden ${ttlDays} Tage nach der letzten Änderung automatisch gelöscht. Die Person mit dem Admin-Link kann den Topf jederzeit vorher löschen. Teilnehmende können sich bis zur Auslosung über ihren persönlichen Link selbst austragen. Gelöschte Daten können noch bis zu 7 Tage in Sicherungskopien enthalten sein.</p>
 
 		<h2>Deine Rechte</h2>
-		<p>Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung, auf Widerspruch und auf Datenübertragbarkeit. Wende dich dafür an die oben genannte E-Mail-Adresse. Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren.</p>
+		<p>Du hast die Rechte aus Art. 15 bis 22 DSGVO: Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Es gibt aber keine Konten und keine E-Mail-Adressen. Wir können deshalb nicht prüfen, wer hinter einem Namen in einem Topf steckt, und Anfragen nach Art. 11 DSGVO nur erfüllen, wenn du uns den Zugang nachweist, der zu den Daten gehört.</p>
+		<p>Am einfachsten geht es ohne uns: Bis zur Auslosung trägst du dich über deine persönliche Seite selbst aus. Die Person mit dem Admin-Link kann dich bis zur Auslosung entfernen und den ganzen Topf jederzeit löschen. Darüber hinaus löschen wir auf Anfrage per E-Mail einen Topf, wenn du uns seinen Admin-Link nennst, und deinen Namen aus einem Topf, wenn du uns deinen persönlichen Link nennst. Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren.</p>
 
 		<p>Stand: Oktober 2026</p>`,
 		{ index: true, description: 'Welche Daten der Wichteltopf speichert und wie lange.' },
