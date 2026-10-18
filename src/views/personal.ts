@@ -38,7 +38,7 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 						])
 					: ''
 			}
-			<p>Unterschreib das Geschenk mit deinem Codenamen, nicht mit deinem Namen. So bleibt geheim, von wem es kommt.</p>
+			<p>Unterschreib das Geschenk nicht mit deinem Namen, damit geheim bleibt, von wem es kommt.</p>
 			<h2>Alle Ergebnisse</h2>
 			${resultList(result, participant.codeName)}`,
 		);
