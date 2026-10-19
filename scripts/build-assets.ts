@@ -1,5 +1,6 @@
 // Writes public/static/themes.css from src/themes.ts, then src/asset-version.ts with a hash of the CSS/JS,
-// so browsers load them again after every change. Run after changing themes, CSS or JS: npm run assets
+// so browsers load them again after every change. Runs before npm test and npm run deploy (pretest/predeploy),
+// so the hash is always current; it can also be run by hand: npm run assets
 import { writeFileSync } from 'node:fs';
 import { themesCss } from '../src/themes.ts';
 import { assetVersion } from './lib/assets.ts';
