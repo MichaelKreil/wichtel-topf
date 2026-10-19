@@ -1,4 +1,4 @@
-# Wichtel-Generator
+# Wichteltopf
 
 An online "Wichteltopf" (Secret Santa pot):
 
@@ -86,7 +86,7 @@ Useful commands: `npx wrangler tail` (live logs), `npx wrangler d1 time-travel r
 | `POT_TTL_DAYS`  | `90`                      | Pots without activity are deleted after this many days            |
 
 ```bash
-docker pull ghcr.io/michaelkreil/wichtel-generator:latest   # published for tags v*
+docker pull ghcr.io/michaelkreil/wichtel-topf:latest   # published for tags v*
 ```
 
 The image runs as a non-root user, stores data in the `/app/database` volume and has a healthcheck on `/healthz`. Put it behind a reverse proxy for TLS and set `BASEURL` and `TRUST_PROXY=1`.

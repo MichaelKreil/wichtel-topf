@@ -98,7 +98,7 @@ jobs:
       - id: meta
         uses: docker/metadata-action@v6
         with:
-          images: ghcr.io/michaelkreil/wichtel-generator
+          images: ghcr.io/michaelkreil/wichtel-topf
           tags: |
             type=raw,value=latest
             type=semver,pattern={{version}}
