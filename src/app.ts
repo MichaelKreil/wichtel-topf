@@ -77,7 +77,10 @@ export function createApp({
 				frameAncestors: ["'none'"],
 				objectSrc: ["'none'"],
 			},
-			referrerPolicy: 'no-referrer',
+			// 'same-origin', not 'no-referrer': with no-referrer, browsers send "Origin: null" on form posts,
+			// so the Origin fallback of the CSRF check below would fail in browsers without Sec-Fetch-Site
+			// (Safari before 16.4). Our own server sees the URLs anyway; other sites still get no referer.
+			referrerPolicy: 'same-origin',
 		}),
 	);
 	// Pages contain names, code names and admin links: never store them in any cache

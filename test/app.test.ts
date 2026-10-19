@@ -192,6 +192,10 @@ describe('app', () => {
 		// Sec-Fetch-Site wins over a matching Origin
 		assert.equal((await post(potPath, { name: 'Mallory' }, { 'Sec-Fetch-Site': 'cross-site' })).status, 403);
 		assert.equal((await post(potPath, { name: 'Anna' }, { 'Sec-Fetch-Site': 'same-origin' })).status, 303);
+		// browsers without Sec-Fetch-Site (Safari before 16.4) are judged by Origin alone
+		assert.equal((await post(potPath, { name: 'Bert' })).status, 303);
+		// "null" is what a no-referrer page (ours before, or an attacker's) produces: not good enough
+		assert.equal((await post(potPath, { name: 'Mallory' }, { Origin: 'null' })).status, 403);
 		// neither header, and no form body
 		const bare = await app.request(`${BASE}${adminPath}/schliessen`, {
 			method: 'POST',
@@ -371,7 +375,8 @@ describe('security', () => {
 			])
 				assert.ok(csp.includes(directive), `${name}: CSP ${directive}`);
 			assert.ok(!csp.includes('unsafe'), `${name}: no unsafe CSP sources`);
-			assert.equal(res.headers.get('referrer-policy'), 'no-referrer', `${name}: referrer policy`);
+			// not 'no-referrer': that would make browsers send "Origin: null" on form posts (see CSRF check)
+			assert.equal(res.headers.get('referrer-policy'), 'same-origin', `${name}: referrer policy`);
 			assert.equal(res.headers.get('x-content-type-options'), 'nosniff', `${name}: nosniff`);
 			assert.equal(res.headers.get('cache-control'), 'no-store', `${name}: not cached`);
 		}
