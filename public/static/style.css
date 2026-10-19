@@ -1124,6 +1124,8 @@ dialog .dialog-actions button {
 footer {
 	display: flex;
 	justify-content: center;
+	align-items: center;
+	gap: 16px;
 	margin-top: 2rem;
 	font-size: 0.85rem;
 }
@@ -1132,4 +1134,21 @@ footer a {
 	display: inline-block;
 	padding: 12px 0;
 	color: var(--ink-soft);
+}
+
+/* the source code, tucked away: a faint mark that shows itself on hover */
+footer .source {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	opacity: 0.4;
+	transition: opacity 0.12s;
+}
+
+footer .source:hover,
+footer .source:focus-visible {
+	opacity: 1;
 }
