@@ -1,28 +1,25 @@
 <!doctype html>
-<!-- Source of public/static/og.jpg (link preview image). Regenerate with: npm run images -->
+<!-- Template of the link preview images (public/static/og/<theme>.jpg), rendered per background by: npm run og
+     It uses the site's own stylesheets, so the card, its color and the photo match the pages. -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<link rel="stylesheet" href="../public/static/style.css">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/themes.css">
 <style>
-	/* style.css uses absolute URLs, which don't resolve for a local file */
-	@font-face { font-family: "Young Serif"; src: url(../public/static/fonts/young-serif-400.woff2); }
-	@font-face { font-family: "Caveat"; font-weight: 600; src: url(../public/static/fonts/caveat-600.woff2); }
-	.tag::before { background-image: url(../public/static/string.svg); }
-	html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+	html, body { width: 1200px; height: 630px; overflow: hidden; }
 	body {
 		padding: 0;
-		background: #3a0f0d url(backgrounds/tree1.jpg) 85% 60% / cover;
 		display: flex;
 		align-items: center;
-		justify-content: center;
 	}
 	main {
 		display: flex;
 		align-items: center;
 		gap: 40px;
 		max-width: none;
-		margin: 0 170px 0 0;
+		/* like the pages: at the left so the photo's motif stays visible, or centered (--card-start: auto) */
+		margin: 0 auto 0 var(--card-start, 80px);
 		padding: 48px 64px 48px 56px;
 	}
 	h1 { font-size: 88px; margin: 0 0 12px; hyphens: none; }
@@ -31,7 +28,7 @@
 	.tag { margin-left: 60px; transform: rotate(-5deg) scale(1.35); }
 </style>
 </head>
-<body>
+<body data-theme="{{theme}}">
 	<main>
 		<div>
 			<h1>Wichteltopf</h1>

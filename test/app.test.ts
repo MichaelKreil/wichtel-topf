@@ -265,6 +265,10 @@ describe('link previews', () => {
 		const { potPath } = await createPot();
 		const pot = await (await get(potPath)).text();
 		assert.ok(pot.includes('<title>Wichteltopf.de · Mitmachen</title>'));
+		assert.ok(
+			pot.includes('<meta property="og:image" content="http://localhost/static/og/candle.jpg">'),
+			'preview of its background',
+		);
 		assert.ok(pot.includes('<meta property="og:title" content="Wichteltopf.de · Mitmachen">'));
 		assert.ok(pot.includes('<meta name="robots" content="noindex">'));
 	});

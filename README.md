@@ -53,6 +53,7 @@ Schema changes go into a new `migrations/NNNN_name.sql` file. Never edit an appl
 2. Run `npm run images` (requires `cwebp`: `brew install webp`, and Google Chrome for the preview image and icons).
 3. Run `npm run colors -- <id>` for the colors.
 4. Add `{ id, label, color, card, align, tags }` to `src/themes.ts` and run `npm run assets`.
+5. Run `npm run og -- <id>` for the link preview image (requires Google Chrome).
 
 Fonts in `public/static/fonts/` are under the SIL Open Font License (see the license files there).
 

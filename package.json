@@ -26,6 +26,7 @@
 		"images": "./scripts/build-images.sh",
 		"assets": "node scripts/build-assets.ts",
 		"colors": "node scripts/theme-colors.ts",
+		"og": "node scripts/build-og.ts",
 		"upgrade": "npx npm-check-updates -u && npm install && npm audit fix"
 	},
 	"author": "Michael Kreil",

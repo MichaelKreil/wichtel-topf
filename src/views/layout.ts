@@ -27,6 +27,8 @@ export function layout(page: Page, title: string, content: Html, options: Layout
 	const description = options.description ?? DEFAULT_DESCRIPTION;
 	const potTitle = page.potTitle ?? '';
 	// the site first, then the pot, then the page: the same in the tab, in bookmarks and in link previews
+	// pages of a pot get the preview image of its background (npm run og), the others the default one
+	const ogImage = page.potTitle === undefined ? '/static/og.jpg' : `/static/og/${page.theme}.jpg`;
 	const fullTitle = ['Wichteltopf.de', potTitle, title].filter(Boolean).join(' · ');
 	return html`<!doctype html>
 <html lang="de">
@@ -41,7 +43,7 @@ export function layout(page: Page, title: string, content: Html, options: Layout
 	<meta property="og:site_name" content="Wichteltopf.de">
 	<meta property="og:title" content="${fullTitle}">
 	<meta property="og:description" content="${description}">
-	<meta property="og:image" content="${page.origin}/static/og.jpg">
+	<meta property="og:image" content="${page.origin}${ogImage}">
 	<meta property="og:image:width" content="1200">
 	<meta property="og:image:height" content="630">
 	<meta name="twitter:card" content="summary_large_image">

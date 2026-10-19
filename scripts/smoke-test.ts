@@ -60,6 +60,7 @@ for (const path of [
 	`/static/img/thumb/${theme}.webp`,
 ])
 	assets.push([path, 'image/webp']);
+assets.push([`/static/og/${theme}.jpg`, 'image/jpeg']);
 for (const [path, type] of assets) {
 	const res = await get(path);
 	const contentType = res.headers.get('content-type') ?? '';

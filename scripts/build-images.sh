@@ -1,6 +1,6 @@
 #!/bin/sh
 # Generates the WebP backgrounds and thumbnails in public/static/img from the sources in assets/backgrounds,
-# and renders the link preview image (public/static/og.jpg) and the PNG icons with headless Chrome.
+# and renders the PNG icons with headless Chrome. The link preview images are rendered by `npm run og`.
 # Requires cwebp (brew install webp), Google Chrome and sips (macOS).
 set -eu
 cd "$(dirname "$0")/.."
@@ -18,9 +18,6 @@ for src in assets/backgrounds/*.jpg assets/backgrounds/*.webp; do
 done
 CHROME=${CHROME:-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"}
 tmp=$(mktemp -d)
-# link preview image (1200x630) from assets/og-image.html
-"$CHROME" --headless=new --hide-scrollbars --window-size=1200,630 --screenshot="$tmp/og.png" "file://$PWD/assets/og-image.html" 2>/dev/null
-sips -s format jpeg -s formatOptions 85 "$tmp/og.png" --out public/static/og.jpg >/dev/null
 # icons: PNG for home screens (apple-touch-icon) and /favicon.ico (PNG data works in all browsers)
 # (iOS rounds icons itself and fills transparent corners black, hence the solid background)
 for size in 180 32; do
