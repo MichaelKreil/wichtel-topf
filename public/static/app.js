@@ -1,3 +1,7 @@
+// "?neu" only picks the heading right after creating a pot or joining one. It doesn't belong
+// in a bookmark or a copied address, so it leaves the address bar once the page is shown.
+if (location.search === '?neu') history.replaceState(null, '', location.pathname);
+
 // Theme preview on the start page
 for (const radio of document.querySelectorAll('input[name="theme"]')) {
 	radio.addEventListener('change', () => {

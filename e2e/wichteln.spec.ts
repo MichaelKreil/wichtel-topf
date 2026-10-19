@@ -12,6 +12,7 @@ test('an organiser and four participants go through a whole round', async ({ pag
 	await page.getByRole('button', { name: 'Wichteltopf anlegen' }).click();
 
 	await expect(page.getByRole('heading', { name: /Wichteltopf angelegt/ })).toBeVisible();
+	await expect(page, 'the marker for the heading leaves the address bar').toHaveURL(/\/admin\/[^?]+$/);
 	await expect(page.locator('body')).toHaveAttribute('data-theme', theme);
 	const potUrl = await page.getByLabel(/Teilnahme-Link/).inputValue();
 	const adminUrl = page.url();
@@ -24,6 +25,7 @@ test('an organiser and four participants go through a whole round', async ({ pag
 		await participant.getByLabel('Dein Vor- und Nachname').fill(name);
 		await participant.getByRole('button', { name: 'Mitmachen' }).click();
 		await expect(participant.getByRole('heading', { name: 'Schön, dass du mitmachst!' })).toBeVisible();
+		await expect(participant).toHaveURL(/\/ich\/[^?]+$/);
 		const codeName = (await participant.locator('.tag-value').first().textContent()) ?? '';
 		expect(codeName).not.toBe('');
 		people.set(name, { page: participant, codeName });
