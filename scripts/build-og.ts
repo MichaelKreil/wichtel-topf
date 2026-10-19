@@ -51,7 +51,7 @@ for (const { id } of themes) {
 	await browser.open(`${base}/og/${id}`);
 	await browser.evaluate('document.fonts.ready.then(() => true)');
 	const jpeg = await sharp(await browser.screenshot())
-		.jpeg({ quality: 85 })
+		.jpeg({ quality: 92, chromaSubsampling: '4:4:4' })
 		.toBuffer();
 	writeFileSync(`${OUT}${id}.jpg`, jpeg);
 	if (id === START_THEME) writeFileSync(`${PUBLIC}static/og.jpg`, jpeg);
