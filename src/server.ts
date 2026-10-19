@@ -1,4 +1,4 @@
-// Entry point for Node.js / Docker. For Cloudflare see src/worker.ts.
+// Entry point for Node.js (development, tests, running without Cloudflare). For Cloudflare see src/worker.ts.
 import { serve } from '@hono/node-server';
 import { getConnInfo } from '@hono/node-server/conninfo';
 import { serveStatic } from '@hono/node-server/serve-static';

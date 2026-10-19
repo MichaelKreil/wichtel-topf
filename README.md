@@ -32,7 +32,7 @@ npm run format   # auto-format with Biome
 | Path                  | Purpose                                                       |
 | --------------------- | ------------------------------------------------------------- |
 | `src/worker.ts`       | Entry point for Cloudflare Workers (incl. daily cleanup cron) |
-| `src/server.ts`       | Entry point for Node.js / Docker                              |
+| `src/server.ts`       | Entry point for Node.js (development, tests)                  |
 | `src/app.ts`          | Routes (Hono), shared by both entry points                    |
 | `src/store.ts`        | Data access, written against the async interface in `db.ts`   |
 | `src/db-d1.ts`        | Database driver for Cloudflare D1                             |
@@ -75,18 +75,6 @@ CI deploys automatically on every push to `main`. This needs the repository secr
 
 Useful commands: `npx wrangler tail` (live logs), `npx wrangler d1 time-travel restore DB --timestamp=…` (restore the DB to a point in time).
 
-## Self-hosting with Node.js / Docker (alternative)
+## Running without Cloudflare
 
-| Variable        | Default                   | Description                                                       |
-| --------------- | ------------------------- | ----------------------------------------------------------------- |
-| `PORT`          | `8080`                    |                                                                   |
-| `BASEURL`       | derived from request      | Public URL used in the displayed links, e.g. `https://wichteln.example.org` |
-| `DATABASE_PATH` | `database/wichtel.sqlite` | SQLite file                                                       |
-| `TRUST_PROXY`   | off                       | Set to `1` behind a reverse proxy, to rate-limit by `X-Forwarded-For` |
-| `POT_TTL_DAYS`  | `90`                      | Pots without activity are deleted after this many days            |
-
-```bash
-docker pull ghcr.io/michaelkreil/wichtel-topf:latest   # published for tags v*
-```
-
-The image runs as a non-root user, stores data in the `/app/database` volume and has a healthcheck on `/healthz`. Put it behind a reverse proxy for TLS and set `BASEURL` and `TRUST_PROXY=1`.
+The same app runs on plain Node.js with a local SQLite file, which is what `npm run dev` and the tests use: `node src/server.ts`. It reads `PORT` (default `8080`), `DATABASE_PATH` (default `database/wichtel.sqlite`), `POT_TTL_DAYS` (default `90`), `BASEURL` (the public URL shown in links, derived from the request by default) and `TRUST_PROXY=1` behind a reverse proxy, to rate-limit by `X-Forwarded-For`. There is no packaged image; the live site runs on Cloudflare.
