@@ -32,6 +32,9 @@ function setup(env: Env) {
 			// set by Cloudflare, can't be faked by clients
 			clientIp: (c) => c.req.header('cf-connecting-ip') ?? '',
 			potTtlDays: ttlDays(env),
+			// Alpha phase: one line per request in Workers Logs (no IPs, no names, shortened tokens),
+			// to see which browsers fail at what. Cloudflare's own invocation logs stay off (wrangler.jsonc).
+			log: (entry) => console.log(JSON.stringify(entry)),
 		});
 		cached = { env, store, app };
 	}

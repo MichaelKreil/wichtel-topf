@@ -29,6 +29,33 @@ export interface AppOptions {
 	potTtlDays?: number;
 	/** Current time, injectable for tests */
 	now?: () => number;
+	/** Receives one entry per request, see RequestLog. Nothing is logged without it. */
+	log?: (entry: RequestLog) => void;
+}
+
+/**
+ * What we record about a request: enough to see which browsers fail at what, but no IP address,
+ * no form contents, and no secret links (the tokens in paths are cut down to a prefix).
+ */
+export interface RequestLog {
+	method: string;
+	/** Path with admin and personal tokens shortened to their first characters */
+	path: string;
+	status: number;
+	/** Why a request was rejected by one of our checks, e.g. "csrf" or "rate-limit" */
+	rejected?: string;
+	userAgent?: string;
+	secFetchSite?: string;
+	origin?: string;
+	/** Milliseconds */
+	duration: number;
+}
+
+const TOKEN_SEGMENTS = /\/(ich|admin)\/([^/?#]{4})[^/?#]*/g;
+
+/** Shortens the secret tokens in a path, so logs don't contain usable links. */
+export function maskTokens(path: string): string {
+	return path.replace(TOKEN_SEGMENTS, '/$1/$2…');
 }
 
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
@@ -41,8 +68,29 @@ export function createApp({
 	clientIp = () => '',
 	potTtlDays = 90,
 	now = Date.now,
+	log,
 }: AppOptions): Hono {
 	const app = new Hono();
+	// why one of the checks below rejected a request, for the log entry
+	const rejections = new WeakMap<Request, string>();
+	const reject = (c: Context, reason: string) => rejections.set(c.req.raw, reason);
+
+	if (log) {
+		app.use(async (c, next) => {
+			const start = performance.now();
+			await next();
+			log({
+				method: c.req.method,
+				path: maskTokens(c.req.path),
+				status: c.res.status,
+				rejected: rejections.get(c.req.raw),
+				userAgent: c.req.header('user-agent'),
+				secFetchSite: c.req.header('sec-fetch-site'),
+				origin: c.req.header('origin'),
+				duration: Math.round(performance.now() - start),
+			});
+		});
+	}
 
 	/** Public origin, e.g. "https://wichteln.example.org". Behind a proxy, BASEURL should be set. */
 	const origin = (c: Context): string => {
@@ -96,6 +144,7 @@ export function createApp({
 		const site = c.req.header('sec-fetch-site');
 		const sameOrigin = site ? site === 'same-origin' : c.req.header('origin') === origin(c);
 		if (sameOrigin) return next();
+		reject(c, 'csrf');
 		return c.html(
 			messagePage(page(c), 'Anfrage abgelehnt', 'Bitte benutze die Formulare auf dieser Seite.', {
 				offerNewPot: false,
@@ -109,6 +158,7 @@ export function createApp({
 		const ip = clientIp(c);
 		const limiter = c.req.path === '/neu' ? rateLimiters.create : rateLimiters.write;
 		if (await limiter(ip)) return next();
+		reject(c, 'rate-limit');
 		return c.html(
 			messagePage(page(c), 'Zu viele Anfragen', 'Bitte warte eine Minute und versuche es dann noch einmal.', {
 				offerNewPot: false,

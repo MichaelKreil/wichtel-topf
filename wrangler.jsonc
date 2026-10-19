@@ -26,8 +26,9 @@
 	"triggers": {
 		"crons": ["17 3 * * *"]
 	},
-	// Only our own console output (errors, cleanup counts). No per-request logs: their URLs would
-	// contain the secret admin and personal links, plus IP addresses.
+	// Only our own console output: errors, cleanup counts, and one line per request written by
+	// src/worker.ts (no IP, no form contents, shortened tokens). Cloudflare's invocation logs stay off:
+	// they would record the full URLs with the secret admin and personal links, plus IP addresses.
 	"observability": {
 		"enabled": true,
 		"logs": { "enabled": true, "invocation_logs": false }

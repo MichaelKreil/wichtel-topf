@@ -31,7 +31,7 @@ export function privacyPage(page: Page, ttlDays: number): Html {
 		<p>Nach dem Eintragen speichern wir ein Cookie mit deinem persönlichen Zugangsschlüssel, damit dich der Teilnahme-Link wiedererkennt. Es ist für diese Funktion technisch notwendig (§ 25 Abs. 2 Nr. 2 TDDDG) und wird nach einem Jahr, beim Austragen oder über „Jemand anderen eintragen“ gelöscht.</p>
 
 		<h2>IP-Adressen</h2>
-		<p>Zum Schutz vor Missbrauch wird die IP-Adresse beim Absenden eines Formulars für eine Minute zur Begrenzung der Anfragen verwendet. Wir speichern keine Zugriffsprotokolle mit IP-Adressen.</p>
+		<p>Zum Schutz vor Missbrauch wird die IP-Adresse beim Absenden eines Formulars für eine Minute zur Begrenzung der Anfragen verwendet. Wir speichern keine Zugriffsprotokolle mit IP-Adressen. In der aktuellen Testphase protokollieren wir zur Fehlersuche für wenige Tage, welche Seite mit welchem Browser aufgerufen wurde und ob die Anfrage erfolgreich war; dabei werden weder IP-Adressen noch eingegebene Namen noch vollständige geheime Links gespeichert.</p>
 
 		<h2>Zweck und Rechtsgrundlage</h2>
 		<p>Die Daten werden nur verarbeitet, um das Wichteln durchzuführen (Art. 6 Abs. 1 lit. b DSGVO), und zum Schutz des Dienstes vor Missbrauch (Art. 6 Abs. 1 lit. f DSGVO).</p>
