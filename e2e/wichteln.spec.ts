@@ -33,7 +33,7 @@ test('an organiser and four participants go through a whole round', async ({ pag
 
 	// the organiser sees them, excludes a couple and closes the pot
 	await page.goto(adminUrl);
-	await expect(page.getByRole('heading', { name: /Im Topf \(4 von/ })).toBeVisible();
+	await expect(page.locator('.count .n')).toHaveText('4');
 	await page.getByLabel('Erste Person').selectOption({ label: 'Anna' });
 	await page.getByLabel('Zweite Person').selectOption({ label: 'Ben' });
 	await page.getByRole('button', { name: 'Hinzufügen' }).click();

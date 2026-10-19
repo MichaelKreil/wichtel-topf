@@ -2,7 +2,7 @@
 import { html } from 'hono/html';
 import type { Participant } from '../store.ts';
 import { type Html, layout, type Page } from './layout.ts';
-import { copyField, giftTag, type ResultRow, resultList } from './parts.ts';
+import { copyField, giftTag, icon, type ResultRow, resultList } from './parts.ts';
 
 export interface PersonalPageProps {
 	page: Page;
@@ -30,15 +30,20 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 			'Meine Seite',
 			html`<h1>Die Ziehung ist abgeschlossen</h1>
 			<p>Hallo ${participant.name}! Du beschenkst:</p>
-			${
-				mine
-					? giftTag([
-							['Von:', participant.codeName],
-							['Für:', mine.receiver],
-						])
-					: ''
-			}
-			<p>Unterschreib das Geschenk nicht mit deinem Namen, damit geheim bleibt, von wem es kommt.</p>
+			<div class="showcase">
+				${
+					mine
+						? giftTag(
+								[
+									['Von:', participant.codeName],
+									['Für:', mine.receiver],
+								],
+								{ emphasize: 1 },
+							)
+						: ''
+				}
+				<p class="aside center">Unterschreib das Geschenk nicht mit deinem Namen, damit geheim bleibt, von wem es kommt.</p>
+			</div>
 			<h2>Alle Ergebnisse</h2>
 			${resultList(result, participant.codeName)}`,
 		);
@@ -47,20 +52,23 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 		page,
 		'Meine Seite',
 		html`<h1>${isNew ? 'Schön, dass du mitmachst!' : 'Du bist dabei'}</h1>
-		<p>Du bist als <b>${participant.name}</b> im Topf. Merke dir deinen geheimen Codenamen:</p>
-		${giftTag([['Von:', participant.codeName]], { emphasize: 0 })}
-		<p>Mach am besten ein Foto von dieser Seite. Nach der Auslosung findest du mit dem Codenamen in der Liste, wen du beschenkst. Verrate ihn niemandem: Wer deinen Codenamen kennt, weiß nachher, von wem das Geschenk kommt.</p>
-		<h2>Diese Seite ist nur für dich</h2>
-		<p>Setz dir ein Lesezeichen oder mail dir die Adresse, dann findest du sie auch auf einem anderen Gerät wieder. Gib sie nicht weiter.</p>
-		${copyField('Adresse dieser Seite', personalUrl, {
+		<p>Du bist als <b>${participant.name}</b> im Topf. Das ist dein geheimer Codename:</p>
+		<div class="showcase">
+			${giftTag([['Von:', participant.codeName]], { emphasize: 0 })}
+			<p class="eyebrow">Mach am besten ein Foto davon</p>
+		</div>
+		<ul class="rules">
+			<li>${icon('eyeOff', 22)}<span><b>Verrate ihn niemandem.</b> Wer deinen Codenamen kennt, weiß nachher, von wem das Geschenk kommt.</span></li>
+			<li>${icon('list', 22)}<span><b>Nach der Auslosung</b> findest du mit dem Codenamen in der Liste, wen du beschenkst.</span></li>
+		</ul>
+		${copyField('Nur für dich: die Adresse dieser Seite', personalUrl, {
 			secret: true,
+			hint: 'Setz dir ein Lesezeichen oder mail dir die Adresse, dann findest du sie auch auf einem anderen Gerät wieder. Gib sie nicht weiter.',
 			extra: html`<a class="button secondary" href="${personalMail(personalUrl)}">An mich mailen</a>`,
 		})}
-
-		<h2>Doch nicht dabei?</h2>
-		<p>Bis zur Auslosung kannst du dich wieder austragen. Dein Name wird dann gelöscht.</p>
-		<form method="post" action="${personalPath}/austragen" data-confirm="Wirklich aus dem Wichteltopf austragen?">
-			<button type="submit" class="secondary">Mich austragen</button>
+		<form method="post" action="${personalPath}/austragen" class="center" data-confirm="Wirklich aus dem Wichteltopf austragen?">
+			<span class="aside">Doch nicht dabei?</span>
+			<button type="submit" class="link">Mich austragen</button>
 		</form>`,
 	);
 }

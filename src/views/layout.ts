@@ -52,6 +52,7 @@ export function layout(page: Page, title: string, content: Html, options: Layout
 	<meta name="theme-color" content="${themeOrDefault(page.theme).color}">
 	<link rel="preload" href="/static/fonts/young-serif-400.woff2" as="font" type="font/woff2" crossorigin>
 	<link rel="preload" href="/static/fonts/caveat-600.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/static/fonts/nunito-sans-400-700.woff2" as="font" type="font/woff2" crossorigin>
 	<link rel="stylesheet" href="/static/style.css?v=${ASSET_VERSION}">
 	<link rel="stylesheet" href="/static/themes.css?v=${ASSET_VERSION}">
 	<script src="/static/app.js?v=${ASSET_VERSION}" defer></script>

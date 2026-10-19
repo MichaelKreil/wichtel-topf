@@ -1,5 +1,5 @@
 // Building blocks used on several pages.
-import { html } from 'hono/html';
+import { html, raw } from 'hono/html';
 import type { Html } from './layout.ts';
 
 export interface ResultRow {
@@ -32,6 +32,20 @@ export function joinNames(names: string[]): Html {
 	return html`${names.slice(0, -1).map((name, i) => html`${i > 0 ? ', ' : ''}${hand(name)}`)} und ${hand(last)}`;
 }
 
+/** Line icons (24px grid), drawn inline so they take the text color; decorative, hidden from screen readers. */
+const ICON_PATHS = {
+	lock: '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+	pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+	eyeOff:
+		'<path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 4.2A10 10 0 0 1 21 12a10.5 10.5 0 0 1-2.1 3"/><path d="M6.6 6.6A10.6 10.6 0 0 0 3 12c1.7 3.7 5 6 9 6a9 9 0 0 0 3.4-.7"/>',
+	list: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>',
+	person: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+};
+
+export function icon(name: keyof typeof ICON_PATHS, size = 20, className = ''): Html {
+	return html`<svg${className ? html` class="${className}"` : ''} aria-hidden="true" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${raw(ICON_PATHS[name])}</svg>`;
+}
+
 /**
  * A paper gift tag with a punched hole and string, written by hand: the signature element.
  * Each line is a label ("Von:", "Für:") and a value. `emphasize` is the index of a line whose value
@@ -55,13 +69,16 @@ interface CopyFieldOptions {
 	extra?: Html;
 	/** A link meant for one person only: marked with a lock, so it isn't mixed up with the group link */
 	secret?: boolean;
+	/** A sentence below the address, e.g. what to do with it */
+	hint?: string;
 }
 
-/** A link in a read-only field with a copy button, optionally with share and further actions. */
-export function copyField(label: string, url: string, { share, extra, secret }: CopyFieldOptions = {}): Html {
+/** A link to hand on: a small card with the address, a copy button, and optionally share and further actions. */
+export function copyField(label: string, url: string, { share, extra, secret, hint }: CopyFieldOptions = {}): Html {
 	return html`<div class="copy${secret ? ' secret' : ''}">
-		<label>${secret ? html`<span class="lock" aria-hidden="true">🔒</span> ` : ''}${label}<input type="text" readonly value="${url}"></label>
-		<div class="copy-actions">
+		<label><span class="label">${secret ? icon('lock', 18, 'lock') : ''}${label}</span><input type="text" readonly value="${url}"></label>
+		${hint ? html`<p class="aside">${hint}</p>` : ''}
+		<div class="actions">
 			${share ? html`<button type="button" data-share="${share.text}" hidden>${share.label}</button>` : ''}
 			<button type="button" class="secondary" data-copy>Kopieren</button>
 			${extra ?? ''}

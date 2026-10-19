@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { beforeEach, describe, it } from 'node:test';
 import type { Hono } from 'hono';
 import { assetVersion } from '../scripts/lib/assets.ts';
-import { createApp } from '../src/app.ts';
+import { createApp, maskTokens, type RequestLog } from '../src/app.ts';
 import { ASSET_VERSION } from '../src/asset-version.ts';
 import { codeNamesFor, DEFAULT_LIST_ID, getCodeNameList } from '../src/codenames.ts';
 
@@ -68,14 +68,17 @@ describe('app', () => {
 		assert.match(admin, /data-theme="candle"/);
 		assert.ok(admin.includes(`http://localhost${potPath}`));
 		// the secret admin link is marked, the group link isn't
-		assert.match(admin, /<div class="copy secret">\s*<label><span class="lock"[^>]*>🔒<\/span> Admin-Link/);
-		assert.match(admin, /<div class="copy">\s*<label>Teilnahme-Link/);
+		assert.match(
+			admin,
+			/<div class="copy secret">\s*<label><span class="label"><svg class="lock"[\s\S]*?<\/svg>Admin-Link/,
+		);
+		assert.match(admin, /<div class="copy">\s*<label><span class="label">Teilnahme-Link/);
 
 		const anna = await join(potPath, 'Anna');
 		assert.equal(anna.res.status, 303);
 		assert.match(anna.personalPath, new RegExp(`^${potPath}/ich/[a-z0-9]{24}$`));
 		assert.match(anna.html, /Schön, dass du mitmachst/);
-		assert.match(anna.html, /Merke dir deinen geheimen Codenamen:/);
+		assert.match(anna.html, /Das ist dein geheimer Codename:/);
 		assert.match(anna.html, /<span class="tag-value important">/, 'the code name is written in red ink');
 		assert.ok(anna.html.includes(`http://localhost${anna.personalPath}`));
 		// the personal link is for bookmarking, not for sharing with others
@@ -83,7 +86,7 @@ describe('app', () => {
 		assert.doesNotMatch(anna.html, /data-share/);
 		assert.match(
 			anna.html,
-			/<div class="copy secret">\s*<label><span class="lock"[^>]*>🔒<\/span> Adresse dieser Seite/,
+			/<div class="copy secret">\s*<label><span class="label"><svg class="lock"[\s\S]*?<\/svg>Nur für dich: die Adresse dieser Seite/,
 		);
 		assert.ok(anna.html.includes(`href="mailto:?subject=Mein%20Wichtel-Link&amp;body=`), 'mail to self');
 		assert.ok(anna.html.includes(encodeURIComponent(`http://localhost${anna.personalPath}`)), 'link in mail');
@@ -127,7 +130,7 @@ describe('app', () => {
 		);
 
 		// the admin joins like everyone else
-		assert.ok(admin.includes(`<a class="button secondary" href="http://localhost${potPath}">Selbst mitmachen</a>`));
+		assert.ok(admin.includes(`<a class="add" href="http://localhost${potPath}">Selbst mitmachen</a>`));
 
 		const closed = await post(`${adminPath}/schliessen`, {});
 		assert.equal(closed.status, 303);
@@ -229,6 +232,67 @@ describe('rate limiting', () => {
 		assert.ok(!(await limiter('a')));
 		now = 1000;
 		assert.ok(await limiter('a'));
+	});
+});
+
+describe('request log', () => {
+	it('records browser and outcome, but no IP, no names and no usable links', async () => {
+		const store = new Store(new NodeDatabase(':memory:'), codeNamesFor);
+		const entries: RequestLog[] = [];
+		const app = createApp({ store, log: (entry) => entries.push(entry) });
+		const headers = {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			Host: 'localhost',
+			'User-Agent': 'TestBrowser/1.0',
+			'cf-connecting-ip': '1.2.3.4',
+		};
+		const created = await app.request(`${BASE}/neu`, {
+			method: 'POST',
+			body: new URLSearchParams({ theme: 'candle' }),
+			headers: { ...headers, 'Sec-Fetch-Site': 'same-origin' },
+		});
+		const adminPath = new URL(created.headers.get('location') ?? '', BASE).pathname;
+		const potPath = adminPath.replace(/\/admin\/.*/, '');
+		await app.request(`${BASE}${adminPath}`, { headers });
+		// a rejected form post
+		await app.request(`${BASE}${potPath}`, {
+			method: 'POST',
+			body: new URLSearchParams({ name: 'Anna Secret' }),
+			headers: { ...headers, Origin: 'null' },
+		});
+
+		assert.equal(entries.length, 3);
+		const [create, admin, rejected] = entries as [RequestLog, RequestLog, RequestLog];
+		assert.deepEqual(
+			{ ...create, duration: 0 },
+			{
+				method: 'POST',
+				path: '/neu',
+				status: 303,
+				rejected: undefined,
+				userAgent: 'TestBrowser/1.0',
+				secFetchSite: 'same-origin',
+				origin: undefined,
+				duration: 0,
+			},
+		);
+		assert.equal(admin.status, 200);
+		assert.match(admin.path, /^\/[^/]+\/admin\/[^/]{4}…$/);
+		assert.equal(rejected.status, 403);
+		assert.equal(rejected.rejected, 'csrf');
+		assert.equal(rejected.origin, 'null');
+		const all = JSON.stringify(entries);
+		assert.ok(!all.includes('1.2.3.4'), 'no IP address');
+		assert.ok(!all.includes('Anna'), 'no form contents');
+		assert.ok(!all.includes(adminPath), 'no full admin link');
+	});
+
+	it('shortens personal and admin tokens, keeps everything else', () => {
+		assert.equal(maskTokens('/Pot-abcdefgh/ich/0123456789abcdef'), '/Pot-abcdefgh/ich/0123…');
+		assert.equal(maskTokens('/Pot-abcdefgh/admin/0123456789abcdef/schliessen'), '/Pot-abcdefgh/admin/0123…/schliessen');
+		assert.equal(maskTokens('/Pot-abcdefgh/ich/0123456789abcdef/austragen'), '/Pot-abcdefgh/ich/0123…/austragen');
+		assert.equal(maskTokens('/Pot-abcdefgh'), '/Pot-abcdefgh');
+		assert.equal(maskTokens('/datenschutz'), '/datenschutz');
 	});
 });
 
@@ -512,7 +576,7 @@ describe('code name lists', () => {
 		const anna = await join(potPath, 'Anna');
 		const codeName = anna.html.match(/Von:<\/span> <span class="tag-value[^"]*">([^<]+)<\/span>/)?.[1] ?? '';
 		assert.ok(getCodeNameList('mittelerde')?.names.includes(codeName), codeName);
-		assert.match(await (await get(adminPath)).text(), /Im Topf \(1 von max\. 43\)/);
+		assert.match(await (await get(adminPath)).text(), /<span class="n">1<\/span>[\s\S]*?Platz für 43/);
 	});
 
 	it('falls back to the default list for unknown ids', async () => {
@@ -612,15 +676,10 @@ describe('pot title', () => {
 			assert.match(html, /<meta property="og:title" content="Wichteltopf\.de · Familie Müller 2026 · [^"]+">/, path);
 		}
 		const admin = await (await get(adminPath)).text();
+		assert.match(admin, /<details class="title-form">\s*<summary>[\s\S]*?Titel ändern<\/summary>/, 'folded away');
 		assert.match(
 			admin,
-			/<span class="value">Familie Müller 2026<\/span>\s*<span class="button small secondary">Ändern<\/span>/,
-		);
-		assert.match(
-			admin,
-			new RegExp(
-				`Codenamen</span>\\s*<span class="value">${getCodeNameList(DEFAULT_LIST_ID)?.label}, bis zu \\d+ Personen`,
-			),
+			new RegExp(`Codenamen: ${getCodeNameList(DEFAULT_LIST_ID)?.label} · Platz für \\d+`),
 			'the chosen list',
 		);
 		assert.doesNotMatch(await (await get('/')).text(), /kicker/);

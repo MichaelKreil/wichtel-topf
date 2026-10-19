@@ -106,7 +106,8 @@ if (confirmForms.length > 0) {
 			event.preventDefault();
 			pending = form;
 			message.textContent = form.dataset.confirm;
-			ok.textContent = event.submitter?.textContent.trim() || 'Ja';
+			// icon buttons (×) carry their label in aria-label
+			ok.textContent = event.submitter?.getAttribute('aria-label') || event.submitter?.textContent.trim() || 'Ja';
 			dialog.showModal(); // focuses "Abbrechen", the safe choice
 		});
 	}
