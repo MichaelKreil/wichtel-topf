@@ -114,6 +114,14 @@ export const THEMES: readonly Theme[] = [
 		tags: ['waldtiere', 'winter'],
 	},
 	{
+		id: 'bunny-art',
+		label: 'Häschen im Schnee, gemalt',
+		color: '#b3bdd3',
+		card: '#dbe7fe',
+		align: 'left',
+		tags: ['waldtiere', 'winter', 'weihnachten'],
+	},
+	{
 		id: 'deer',
 		label: 'Reh im Morgennebel',
 		color: '#988c72',
