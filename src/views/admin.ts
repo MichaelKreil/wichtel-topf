@@ -12,6 +12,8 @@ export interface AdminPageProps {
 	deletion: string;
 	/** A personal link the organiser just re-issued, to hand over to that participant */
 	newLink?: { name: string; url: string };
+	/** Label of the pot's code name list */
+	codeNameList: string;
 	/** One per code name in the pot's list */
 	maxParticipants: number;
 	potUrl: string;
@@ -33,21 +35,26 @@ function linksMail(potUrl: string, adminUrl: string): string {
 	return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-/** Sets the title; without one, the form asks for it, with one it's folded away. */
-function titleForm({ title, adminPath }: AdminPageProps): Html {
-	const form = html`<form method="post" action="${adminPath}/titel">
-		<label for="title">Titel des Topfs</label>
-		<input type="text" id="title" name="title" value="${title}" maxlength="${MAX_TITLE_LENGTH}" placeholder="z. B. Familie Müller 2026" autocomplete="off">
-		<button type="submit" class="secondary">Titel speichern</button>
-	</form>`;
-	return title
-		? html`<details class="title-form">
-		<summary>Titel ändern</summary>
-		${form}
-	</details>`
-		: html`<section class="title-form">
-		<p>Gib dem Topf einen Titel, damit niemand ihn mit einem anderen verwechselt. Er steht auf allen Seiten und in der Vorschau, wenn du den Link verschickst.</p>
-		${form}
+/** What the pot was created with: the title, which can be changed, and the code name list, which can't. */
+function settings({ title, adminPath, codeNameList, maxParticipants }: AdminPageProps): Html {
+	return html`<section class="facts">
+		<details class="title-form"${title ? '' : ' open'}>
+			<summary>
+				<span class="label">Titel</span>
+				<span class="value">${title || 'noch keiner'}</span>
+				<span class="button small secondary">${title ? 'Ändern' : 'Setzen'}</span>
+			</summary>
+			${title ? '' : html`<p>Gib dem Topf einen Titel, damit niemand ihn mit einem anderen verwechselt. Er steht auf allen Seiten und in der Vorschau, wenn du den Link verschickst.</p>`}
+			<form method="post" action="${adminPath}/titel">
+				<label for="title">Titel des Topfs</label>
+				<input type="text" id="title" name="title" value="${title}" maxlength="${MAX_TITLE_LENGTH}" placeholder="z. B. Familie Müller 2026" autocomplete="off">
+				<button type="submit" class="secondary">Titel speichern</button>
+			</form>
+		</details>
+		<p class="fact">
+			<span class="label">Codenamen</span>
+			<span class="value">${codeNameList}, bis zu ${maxParticipants} Personen</span>
+		</p>
 	</section>`;
 }
 
@@ -63,7 +70,7 @@ export function adminPage(props: AdminPageProps): Html {
 		html`<h1>${props.isNew ? 'Wichteltopf angelegt 🎉' : 'Dein Wichteltopf'}</h1>
 		${props.error ? html`<p class="error" role="alert">${props.error}</p>` : ''}
 
-		${titleForm(props)}
+		${settings(props)}
 		${
 			props.newLink
 				? html`<section class="notice">

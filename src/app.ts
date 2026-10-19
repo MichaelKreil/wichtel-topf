@@ -260,6 +260,7 @@ export function createApp({
 				title: pot.title,
 				deletion: deletionDate(pot.updatedAt, potTtlDays),
 				newLink: reissued && { name: reissued.name, url: origin(c) + personalPath(pot, reissued) },
+				codeNameList: getCodeNameList(pot.codeNameList)?.label ?? '',
 				maxParticipants: store.maxParticipants(pot),
 				potUrl: origin(c) + potPath(pot),
 				adminUrl: origin(c) + adminPath(pot),

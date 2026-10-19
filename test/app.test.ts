@@ -606,7 +606,18 @@ describe('pot title', () => {
 			assert.match(html, /<title>Wichteltopf\.de · Familie Müller 2026 · [^<]+<\/title>/, path);
 			assert.match(html, /<meta property="og:title" content="Wichteltopf\.de · Familie Müller 2026 · [^"]+">/, path);
 		}
-		assert.match(await (await get(adminPath)).text(), /<summary>Titel ändern<\/summary>/);
+		const admin = await (await get(adminPath)).text();
+		assert.match(
+			admin,
+			/<span class="value">Familie Müller 2026<\/span>\s*<span class="button small secondary">Ändern<\/span>/,
+		);
+		assert.match(
+			admin,
+			new RegExp(
+				`Codenamen</span>\\s*<span class="value">${getCodeNameList(DEFAULT_LIST_ID)?.label}, bis zu \\d+ Personen`,
+			),
+			'the chosen list',
+		);
 		assert.doesNotMatch(await (await get('/')).text(), /kicker/);
 	});
 
@@ -615,6 +626,7 @@ describe('pot title', () => {
 		let html = await (await get(adminPath)).text();
 		assert.doesNotMatch(html, /kicker/);
 		assert.match(html, /Gib dem Topf einen Titel/);
+		assert.match(html, /<details class="title-form" open>/, 'the form is open until there is a title');
 
 		assert.equal((await post(`${adminPath}/titel`, { title: '<b>Büro</b>' })).status, 303);
 		html = await (await get(potPath)).text();

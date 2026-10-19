@@ -455,7 +455,8 @@ button.secondary:hover,
 }
 
 /* compact, but still at least 44px high: the recommended minimum for touch */
-button.small {
+button.small,
+.button.small {
 	min-height: 44px;
 	margin: 0;
 	padding: 4px 14px;
@@ -741,13 +742,45 @@ footer a {
 	color: var(--ink-soft);
 }
 
-/* the title form on the admin page */
-.title-form label {
+/* the pot's settings on the admin page: one row per fact, the title's row opens its form */
+.facts {
+	margin: 0.5rem 0 1rem;
+}
+
+.fact,
+.facts summary {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+	padding: 4px 0;
+}
+
+.facts summary {
+	list-style: none;
+	cursor: pointer;
+}
+
+.facts summary::-webkit-details-marker {
+	display: none;
+}
+
+.facts .label {
+	flex: 0 0 5.5rem;
+	color: var(--ink-soft);
 	font-size: 0.95rem;
 }
 
-.title-form summary {
-	padding: 12px 0;
-	color: var(--ink-soft);
-	cursor: pointer;
+.facts .value {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.facts .button {
+	flex-shrink: 0;
+}
+
+.title-form label {
+	font-size: 0.95rem;
 }
