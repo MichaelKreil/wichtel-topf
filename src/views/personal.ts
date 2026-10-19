@@ -27,7 +27,7 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 		const mine = result.find((r) => r.codeName === participant.codeName);
 		return layout(
 			page,
-			'Ergebnis',
+			'Meine Seite',
 			html`<h1>Die Ziehung ist abgeschlossen</h1>
 			<p>Hallo ${participant.name}! Du beschenkst:</p>
 			${
@@ -45,7 +45,7 @@ export function personalPage({ page, participant, personalPath, personalUrl, isN
 	}
 	return layout(
 		page,
-		'Du bist dabei',
+		'Meine Seite',
 		html`<h1>${isNew ? 'Schön, dass du mitmachst!' : 'Du bist dabei'}</h1>
 		<p>Du bist als <b>${participant.name}</b> im Topf. Merke dir deinen geheimen Codenamen:</p>
 		${giftTag([['Von:', participant.codeName]], { emphasize: 0 })}

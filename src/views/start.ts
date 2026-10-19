@@ -15,7 +15,7 @@ export interface StartPageProps {
 export function startPage(page: Page, { ttlDays, deletion }: StartPageProps): Html {
 	return layout(
 		page,
-		'Wichteltopf anlegen',
+		'Wichteln online auslosen',
 		html`<div class="hero">
 			<h1>Wichteltopf</h1>
 			<p class="lead">Alle werfen ihren Namen in den Topf. Dann wird geheim ausgelost, wer wen beschenkt.</p>

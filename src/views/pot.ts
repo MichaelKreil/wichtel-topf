@@ -22,7 +22,7 @@ export function potPage({ page, potPath, participants, me, error }: PotPageProps
 	const names = participants.map((p) => p.name);
 	return layout(
 		page,
-		'Mach mit beim Wichteln!',
+		'Mitmachen',
 		html`<h1>Wichteltopf</h1>
 		${
 			names.length === 0

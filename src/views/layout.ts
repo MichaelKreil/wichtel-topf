@@ -26,18 +26,20 @@ const DEFAULT_DESCRIPTION = 'Kostenloser Online-Wichteltopf: Namen eintragen, ge
 export function layout(page: Page, title: string, content: Html, options: LayoutOptions = {}): Html {
 	const description = options.description ?? DEFAULT_DESCRIPTION;
 	const potTitle = page.potTitle ?? '';
+	// the site first, then the pot, then the page: the same in the tab, in bookmarks and in link previews
+	const fullTitle = ['Wichteltopf.de', potTitle, title].filter(Boolean).join(' · ');
 	return html`<!doctype html>
 <html lang="de">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="referrer" content="no-referrer">
-	<title>${title} · ${potTitle ? `${potTitle} · ` : ''}Wichteltopf</title>
+	<title>${fullTitle}</title>
 	<meta name="description" content="${description}">
 	${options.index ? '' : html`<meta name="robots" content="noindex">`}
 	<meta property="og:type" content="website">
-	<meta property="og:site_name" content="Wichteltopf">
-	<meta property="og:title" content="${potTitle ? `${potTitle} · ${title}` : title}">
+	<meta property="og:site_name" content="Wichteltopf.de">
+	<meta property="og:title" content="${fullTitle}">
 	<meta property="og:description" content="${description}">
 	<meta property="og:image" content="${page.origin}/static/og.jpg">
 	<meta property="og:image:width" content="1200">

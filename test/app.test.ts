@@ -248,7 +248,9 @@ describe('errors and caching', () => {
 		);
 		const res = await createApp({ store: failing }).request(`${BASE}/SomePot-abcdefgh`);
 		assert.equal(res.status, 500);
-		assert.match(await res.text(), /Da ist etwas schiefgelaufen/);
+		const html = await res.text();
+		assert.match(html, /Da ist etwas schiefgelaufen/);
+		assert.match(html, /<title>Wichteltopf\.de · Fehler<\/title>/, 'a short title for the tab');
 		assert.equal(res.headers.get('cache-control'), 'no-store');
 	});
 });
@@ -258,10 +260,12 @@ describe('link previews', () => {
 		const start = await (await get('/')).text();
 		assert.ok(start.includes('<meta property="og:image" content="http://localhost/static/og.jpg">'));
 		assert.ok(!start.includes('noindex'));
+		assert.ok(start.includes('<title>Wichteltopf.de · Wichteln online auslosen</title>'));
 
 		const { potPath } = await createPot();
 		const pot = await (await get(potPath)).text();
-		assert.ok(pot.includes('<meta property="og:title" content="Mach mit beim Wichteln!">'));
+		assert.ok(pot.includes('<title>Wichteltopf.de · Mitmachen</title>'));
+		assert.ok(pot.includes('<meta property="og:title" content="Wichteltopf.de · Mitmachen">'));
 		assert.ok(pot.includes('<meta name="robots" content="noindex">'));
 	});
 });
@@ -309,7 +313,9 @@ describe('deleting data', () => {
 		const { potPath, adminPath } = await createPot();
 		const anna = await join(potPath, 'Anna');
 		const res = await post(`${anna.personalPath}/austragen`, {});
-		assert.match(await res.text(), /Du bist ausgetragen/);
+		const html = await res.text();
+		assert.match(html, /Du bist ausgetragen/);
+		assert.match(html, /<title>Wichteltopf\.de · Ausgetragen<\/title>/);
 		assert.match(res.headers.get('set-cookie') ?? '', /Max-Age=0/);
 		assert.equal((await store.listParticipants(potPath.slice(1))).length, 0);
 		assert.equal((await get(anna.personalPath)).status, 404);
@@ -593,8 +599,8 @@ describe('pot title', () => {
 		for (const path of [potPath, anna.personalPath, adminPath]) {
 			const html = await (await get(path)).text();
 			assert.match(html, /<p class="kicker">Familie Müller 2026<\/p>/, path);
-			assert.match(html, /<title>[^<]* · Familie Müller 2026 · Wichteltopf<\/title>/, path);
-			assert.match(html, /<meta property="og:title" content="Familie Müller 2026 · [^"]+">/, path);
+			assert.match(html, /<title>Wichteltopf\.de · Familie Müller 2026 · [^<]+<\/title>/, path);
+			assert.match(html, /<meta property="og:title" content="Wichteltopf\.de · Familie Müller 2026 · [^"]+">/, path);
 		}
 		assert.match(await (await get(adminPath)).text(), /<summary>Titel ändern<\/summary>/);
 		assert.doesNotMatch(await (await get('/')).text(), /kicker/);
@@ -609,7 +615,7 @@ describe('pot title', () => {
 		assert.equal((await post(`${adminPath}/titel`, { title: '<b>Büro</b>' })).status, 303);
 		html = await (await get(potPath)).text();
 		assert.match(html, /<p class="kicker">&lt;b&gt;Büro&lt;\/b&gt;<\/p>/, 'escaped');
-		assert.match(html, /<title>[^<]* · &lt;b&gt;Büro&lt;\/b&gt; · Wichteltopf<\/title>/);
+		assert.match(html, /<title>Wichteltopf\.de · &lt;b&gt;Büro&lt;\/b&gt; · Mitmachen<\/title>/);
 
 		await post(`${adminPath}/titel`, { title: 'x'.repeat(100) });
 		assert.equal((await store.getPot(potPath.slice(1)))?.title.length, 60);

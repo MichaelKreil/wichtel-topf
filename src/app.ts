@@ -94,7 +94,9 @@ export function createApp({
 		const sameOrigin = site ? site === 'same-origin' : c.req.header('origin') === origin(c);
 		if (sameOrigin) return next();
 		return c.html(
-			messagePage(page(c), 'Anfrage abgelehnt', 'Bitte benutze die Formulare auf dieser Seite.', false),
+			messagePage(page(c), 'Anfrage abgelehnt', 'Bitte benutze die Formulare auf dieser Seite.', {
+				offerNewPot: false,
+			}),
 			403,
 		);
 	});
@@ -105,7 +107,9 @@ export function createApp({
 		const limiter = c.req.path === '/neu' ? rateLimiters.create : rateLimiters.write;
 		if (await limiter(ip)) return next();
 		return c.html(
-			messagePage(page(c), 'Zu viele Anfragen', 'Bitte warte eine Minute und versuche es dann noch einmal.', false),
+			messagePage(page(c), 'Zu viele Anfragen', 'Bitte warte eine Minute und versuche es dann noch einmal.', {
+				offerNewPot: false,
+			}),
 			429,
 		);
 	});
@@ -188,7 +192,10 @@ export function createApp({
 		await store.removeParticipant(pot, me.id);
 		deleteCookie(c, cookieName(pot), { path: '/' });
 		return c.html(
-			messagePage(page(c, pot), 'Du bist ausgetragen', 'Dein Name wurde aus dem Wichteltopf gelöscht.', false),
+			messagePage(page(c, pot), 'Du bist ausgetragen', 'Dein Name wurde aus dem Wichteltopf gelöscht.', {
+				title: 'Ausgetragen',
+				offerNewPot: false,
+			}),
 		);
 	});
 
@@ -331,7 +338,10 @@ export function createApp({
 		if (error instanceof HTTPException) return error.getResponse();
 		console.error(error);
 		return c.html(
-			messagePage(page(c), 'Da ist etwas schiefgelaufen', 'Bitte versuche es in ein paar Minuten noch einmal.', false),
+			messagePage(page(c), 'Da ist etwas schiefgelaufen', 'Bitte versuche es in ein paar Minuten noch einmal.', {
+				title: 'Fehler',
+				offerNewPot: false,
+			}),
 			500,
 		);
 	});
