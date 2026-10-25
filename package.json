@@ -39,13 +39,13 @@
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.14.0",
-		"@biomejs/biome": "^2.5.15",
+		"@biomejs/biome": "^2.6.2",
 		"@playwright/test": "^1.64.1",
 		"@types/node": "^26.6.5",
 		"npm-check-updates": "^23.1.1",
 		"sharp": "^0.35.5",
 		"typescript": "^7.0.2",
-		"wrangler": "^4.151.1"
+		"wrangler": "^4.151.3"
 	},
 	"allowScripts": {
 		"esbuild": true,
